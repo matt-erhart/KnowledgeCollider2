@@ -11,11 +11,13 @@ const history = createBrowserHistory();
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router history={history}>
-      <Switch>
-        <Route path="/" component={App} />
-      </Switch>
-    </Router>
+    <App />
   </Provider>,
   document.getElementById("root")
 );
+// <Router history={history}>
+//   <Switch>
+//     {/*<Route path="/" component={App} />*/}
+//     <App></App>
+//   </Switch>
+// </Router>

@@ -6,9 +6,10 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 // import { RootState } from "../redux/reducers";
 // import { Header, MainSection } from "../components";
+import { SnippetGrid } from "../thelab/SnippetGrid";
 
 export namespace App {
-  export interface Props extends RouteComponentProps<void> {
+  export interface Props {
     // todos: TodoItemData[];
     // actions: typeof TodoActions;
   }
@@ -19,12 +20,11 @@ export namespace App {
 }
 
 // @connect(mapStateToProps, mapDispatchToProps)
-export class App extends React.Component<App.Props, App.State> {
+export class App extends React.Component<null, null> {
   render() {
-    const { children } = this.props;
     return (
       <div>
-       hey
+        <SnippetGrid />
       </div>
     );
   }
