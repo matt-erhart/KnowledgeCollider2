@@ -1,11 +1,19 @@
 import { handleActions } from 'redux-actions';
-import * as Actions from '../constants/actions';
 
 const initialState: TodoStoreState = [{
   id: 0,
   text: 'Use Redux',
   completed: false
 }];
+
+export namespace Actions {
+  export const ADD_TODO = 'ADD_TODO';
+  export const EDIT_TODO = 'EDIT_TODO';
+  export const DELETE_TODO = 'DELETE_TODO';
+  export const COMPLETE_TODO = 'COMPLETE_TODO';
+  export const COMPLETE_ALL = 'COMPLETE_ALL';
+  export const CLEAR_COMPLETED = 'CLEAR_COMPLETED';
+}
 
 export default handleActions<TodoStoreState, TodoItemData>({
   [Actions.ADD_TODO]: (state, action) => {
