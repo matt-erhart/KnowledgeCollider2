@@ -66,7 +66,7 @@ export class SnippetGrid extends React.Component<SnippetGrid.Props, SnippetGrid.
 
   generateDOM() {
     return _.map(_.range(this.props.items), function(i) {
-      return (<div key={i} style={{backgroundColor: 'black', opacity: .5}}><span className="text" >{i}</span></div>);
+      return (<div key={i} style={{backgroundColor: 'black', opacity: .5}} ><span className="text" >{i}</span></div>);
     });
   }
 
@@ -78,10 +78,10 @@ export class SnippetGrid extends React.Component<SnippetGrid.Props, SnippetGrid.
     });
   }
 
-  onLayoutChange(layout) {
+  onLayoutChange = (layout) => {
   // this.props.onLayoutChange(layout);
   this.setState({layout: layout});
-},
+  }
 
    render() {
     return (
