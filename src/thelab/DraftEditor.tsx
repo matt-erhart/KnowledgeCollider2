@@ -5,8 +5,8 @@ import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-u
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin"; // eslint-disable-line import/no-unresolved
 // import mentions from "./mentions";
 import styled from "styled-components";
-import getSnippets from "./getSnippets"
-import { fromJS } from 'immutable';
+import getSnippets from "./getSnippets";
+import { fromJS } from "immutable";
 
 const EditorCss = styled.div`
 box-sizing: border-box;
@@ -24,11 +24,13 @@ box-sizing: border-box;
 
 const mentionPlugin = createMentionPlugin({
   // mentions,
-  mentionComponent: props => 
+  mentionComponent: props =>
     <span
       className={props.className}
       // eslint-disable-next-line no-alert
-      onClick={(e) => console.log(e.nativeEvent)}
+      onClick={e => {
+        const text = e.nativeEvent.srcElement.textContent;
+      }}
     >
       {props.children}
     </span>
@@ -60,16 +62,18 @@ export default class CustomMentionEditor extends React.Component<any, any> {
     this.editor.focus();
   };
 
-  componentDidMount()  {
+  componentDidMount() {
     getSnippets.take(1).subscribe(snippets => {
-
-      let snipsForSuggestions =[];
-       snippets.forEach(snip =>{
-         snipsForSuggestions.push({name: snip.snippet, link: snip.url, avatar: snip.downloadUrl})
-       })
-       this.setState({snippets: fromJS(snipsForSuggestions)})
-    })
-
+      let snipsForSuggestions = [];
+      snippets.forEach(snip => {
+        snipsForSuggestions.push({
+          name: snip.snippet,
+          link: snip.url,
+          avatar: snip.downloadUrl
+        });
+      });
+      this.setState({ snippets: fromJS(snipsForSuggestions) });
+    });
   }
 
   render() {

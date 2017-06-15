@@ -36,29 +36,3 @@ let snippets$ = Rx.Observable
   );
 
 export default snippets$;
-
-// export default async function() {
-//   var snapshot = await query.once("value");
-//   let snapShots = [];
-//   let imgUrls = [];
-//   for await (let snap of snapshot) {
-//     var key = snap.key;
-//     var data: snippet = snap.val();
-//     storageRef.child(data.imgPath).getDownloadURL().then(downloadUrl => {
-//       data.downloadUrl = downloadUrl;
-//       snapShots.push(data);
-//     });
-//   }
-
-//   return await snapShots;
-// }
-
-// _.forEach(this.props.snippets, (snip,key) => {
-//         if (!_.includes(_.keys(this.state.imgSrcs), key)){
-//           console.log('snip', snip, key)
-//           const ref = storageRef.child(snip.imgPath);
-//             ref.getDownloadURL().then((url) => {
-//             this.setState({imgSrcs: {...this.state.imgSrcs, [key]: url}})
-//           });
-//         }
-//       })

@@ -7,7 +7,7 @@ import { RouteComponentProps } from "react-router";
 // import { RootState } from "../redux/reducers";
 // import { Header, MainSection } from "../components";
 import { SnippetGrid } from "../thelab/SnippetGrid";
-import UnicornEditor from "../thelab/DraftEditor"
+import {Simple} from "../thelab/Draft2"
 export namespace App {
   export interface Props {
     // todos: TodoItemData[];
@@ -24,7 +24,7 @@ export class App extends React.Component<null, null> {
   render() {
     return (
       <div>
-      <UnicornEditor/>
+      <Simple/>
 
       </div>
     );
