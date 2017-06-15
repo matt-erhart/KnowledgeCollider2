@@ -8,6 +8,8 @@ import {
 import { reactReduxFirebase, firebaseStateReducer } from "react-redux-firebase";
 import * as firebase from "firebase/app";
 import "firebase/storage";
+import "firebase/database";
+
 
 import { logger } from "./middleware";
 
@@ -21,7 +23,8 @@ const firebaseConfig = {
 };
 
 export var fire = firebase.initializeApp(firebaseConfig);
-var storageRef = fire.storage().ref();
+export var storageRef = fire.storage().ref();
+export var dbRef = fire.database()
 
 export interface RootState {
   firebase: any;
