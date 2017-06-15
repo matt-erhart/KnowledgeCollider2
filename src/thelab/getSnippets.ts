@@ -6,7 +6,8 @@ interface snippet {
   comment: string;
   created: string;
   imgPath: string;
-  snippettitle: string;
+  snippet: string;
+  title: string;
   url: string;
   downloadUrl?: any; //of the image.
   id?: string;

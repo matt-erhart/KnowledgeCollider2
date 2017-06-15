@@ -3,9 +3,11 @@ require("!style-loader!css-loader!draft-js-mention-plugin/lib/plugin.css"); // e
 import { EditorState } from "draft-js";
 import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin"; // eslint-disable-line import/no-unresolved
-import mentions from "./mentions";
+// import mentions from "./mentions";
 import styled from "styled-components";
 import getSnippets from "./getSnippets"
+import { fromJS } from 'immutable';
+
 const EditorCss = styled.div`
 box-sizing: border-box;
   border: 1px solid #ddd;
@@ -19,13 +21,14 @@ box-sizing: border-box;
   min-height: 140px;
   }
 `;
+
 const mentionPlugin = createMentionPlugin({
-  mentions,
+  // mentions,
   mentionComponent: props => 
     <span
       className={props.className}
       // eslint-disable-next-line no-alert
-      onClick={() => alert("Clicked on the Mention!")}
+      onClick={(e) => console.log(e.nativeEvent)}
     >
       {props.children}
     </span>
@@ -37,7 +40,8 @@ export default class CustomMentionEditor extends React.Component<any, any> {
   editor;
   state = {
     editorState: EditorState.createEmpty(),
-    suggestions: mentions
+    suggestions: {},
+    snippets: {}
   };
 
   onChange = editorState => {
@@ -48,7 +52,7 @@ export default class CustomMentionEditor extends React.Component<any, any> {
 
   onSearchChange = ({ value }) => {
     this.setState({
-      suggestions: defaultSuggestionsFilter(value, mentions)
+      suggestions: defaultSuggestionsFilter(value, this.state.snippets, 10)
     });
   };
 
@@ -57,7 +61,14 @@ export default class CustomMentionEditor extends React.Component<any, any> {
   };
 
   componentDidMount()  {
-    getSnippets.subscribe(x => console.log(x))
+    getSnippets.take(1).subscribe(snippets => {
+
+      let snipsForSuggestions =[];
+       snippets.forEach(snip =>{
+         snipsForSuggestions.push({name: snip.snippet, link: snip.url, avatar: snip.downloadUrl})
+       })
+       this.setState({snippets: fromJS(snipsForSuggestions)})
+    })
 
   }
 
