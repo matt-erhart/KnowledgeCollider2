@@ -8,6 +8,7 @@ import { RouteComponentProps } from "react-router";
 // import { Header, MainSection } from "../components";
 import { SnippetGrid } from "../thelab/SnippetGrid";
 import {Simple} from "../thelab/Draft2"
+import {ComplexDecorator} from "../thelab/ComplexDecorator"
 export namespace App {
   export interface Props {
     // todos: TodoItemData[];
@@ -24,7 +25,7 @@ export class App extends React.Component<null, null> {
   render() {
     return (
       <div>
-      <Simple/>
+      <ComplexDecorator/>
 
       </div>
     );
