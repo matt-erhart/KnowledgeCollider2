@@ -2,7 +2,7 @@ import { storageRef, dbRef } from "../redux/configureStore";
 import * as _ from "lodash";
 import * as Rx from "rxjs";
 
-interface snippet {
+export interface snippet {
   comment: string;
   created: string;
   imgPath: string;
