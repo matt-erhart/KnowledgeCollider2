@@ -1,19 +1,25 @@
 import * as React from "react";
 import * as Draft from "draft-js";
 const rawSampleJson = require("./draft.json");
+interface State {
+    editorState: Draft.EditorState;
+    retrievedData: string;
+}
 
 export class Simple extends React.Component<
   null,
-  { editorState: Draft.EditorState }
+  State
 > {
   state = {
     editorState: Draft.EditorState.createEmpty(),
     plainText: "This is a plain string of text",
-    html: "<h1>Header</h1> <b>Bold text</b>, <i>Italic text</i><br/ ><br />"
+    html: "<h1>Header</h1> <b>Bold text</b>, <i>Italic text</i><br/ ><br />",
+    retrievedData: ""
   };
 
   editorStateChanged = (newEditorState: Draft.EditorState) => {
     this.setState({ editorState: newEditorState });
+    this.getEntityAtCursor(newEditorState);
   };
 
   contentState() {
@@ -63,32 +69,106 @@ export class Simple extends React.Component<
     };
   }
 
-  setSelection(offset: number, focusOffset: number)  {
-        const {editorState} = this.state;
-        const selectionState = editorState.getSelection();
+  setSelection(offset: number, focusOffset: number) {
+    const { editorState } = this.state;
+    const selectionState = editorState.getSelection();
 
-        // we cant set the selection state directly because its immutable.
-        // so make a copy  
-        const newSelection = selectionState.merge({
-            anchorOffset: Math.round(offset),
-            focusOffset: Math.round(focusOffset),
-        }) as Draft.SelectionState;
+    // we cant set the selection state directly because its immutable.
+    // so make a copy
+    const newSelection = selectionState.merge({
+      anchorOffset: Math.round(offset),
+      focusOffset: Math.round(focusOffset)
+    }) as Draft.SelectionState;
 
-        // Draft API helper set the selection into a new editorState
-        const newEditorState = Draft.EditorState.forceSelection(editorState, newSelection);
+    // Draft API helper set the selection into a new editorState
+    const newEditorState = Draft.EditorState.forceSelection(
+      editorState,
+      newSelection
+    );
 
-        // update the editorState 
-        this.editorStateChanged(newEditorState);
+    // update the editorState
+    this.editorStateChanged(newEditorState);
+  }
+
+  setEntity(data: string, mutabilaty: string = "IMMUTABLE") {
+    const editorState = this.state.editorState;
+    const contentstate = editorState.getCurrentContent();
+
+    // the entity is created from the content state and returns the actual entety
+    // we don't need the actual entety but we do need a key
+    contentstate.createEntity("myEntityIdentifier", mutabilaty, {
+      storedText: data
+    });
+
+    // This is how we get the key
+    const entityKey = contentstate.getLastCreatedEntityKey();
+
+    // get the current selection
+    const selectionState = this.state.editorState.getSelection();
+
+    // associate the text in the selection (from - to) to the entety and get a new content state
+    const newContentState = Draft.Modifier.applyEntity(
+      contentstate,
+      selectionState,
+      entityKey
+    );
+
+    // add the new content state to the existing editor state and return a new editorstate
+    const newEditorState = Draft.EditorState.push(
+      this.state.editorState,
+      newContentState,
+      "apply-entity"
+    );
+
+    // update the Edit controll
+    this.editorStateChanged(newEditorState);
+  }
+
+  getEntityAtCursor = (editorState: Draft.EditorState) => {
+    const selectionState = editorState.getSelection();
+    const selectionKey = selectionState.getStartKey();
+    const contentstate = editorState.getCurrentContent();
+
+    // get the block where the cursor is
+    const block = contentstate.getBlockForKey(selectionKey);
+
+    // get the Entity key at the where the cursor is
+    const entityKey = block.getEntityAt(selectionState.getStartOffset());
+    if (entityKey) {
+      // use the following method to get the entity instance
+      const entityInstance = contentstate.getEntity(entityKey);
+      const data = entityInstance.getData().storedText;
+      this.setState({ retrievedData: data}); //@ts-ignore
+    } else {
+      this.setState({ retrievedData: '' });
     }
+  }
 
   render() {
     return (
       <div>
+          <span>Clicked entity: {this.state.retrievedData}</span>
         <div className="editor" style={{ backgroundColor: "grey" }}>
           <Draft.Editor
             editorState={this.state.editorState}
             onChange={this.editorStateChanged}
           />
+        </div>
+        <div>
+          <button
+            className="btn btn-default"
+            onClick={() => this.setEntity("concept", "IMMUTABLE")}
+          >
+            Set as concept
+          </button>
+
+          <button
+            className="btn btn-default"
+            onClick={() => this.setEntity("linking phrase", "IMMUTABLE")}
+          >
+            Set as linking phrase
+          </button>
+
         </div>
 
         <div className="row">
@@ -126,7 +206,13 @@ export class Simple extends React.Component<
             focusOffset {this.selectionState().focusOffset}
             isBackwards {this.selectionState().isBackwards ? "yes" : "no"}
           </div>
-          <button onClick={e=>{this.setSelection(Math.random()*15,Math.random()*15)}}>Random Selection</button>
+          <button
+            onClick={e => {
+              this.setSelection(Math.random() * 15, Math.random() * 15);
+            }}
+          >
+            Random Selection
+          </button>
         </div>
       </div>
     );
