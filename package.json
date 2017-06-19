@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --debug --devtool cheap-module-source-map --output-pathinfo --history-api-fallback --hot --inline --progress --colors --port 3000 --open",
+    "start": "webpack-dev-server --debug --devtool cheap-module-source-map --output-pathinfo --history-api-fallback --hot --inline --progress --colors --port 3002 --open",
     "build": "webpack -p --progress --colors"
   },
   "license": "MIT",
@@ -61,6 +61,7 @@
     "react": "^15.5.4",
     "react-autosize-textarea": "^0.4.3",
     "react-dom": "^15.5.4",
+    "react-draft-wysiwyg": "^1.10.0",
     "react-grid-layout": "^0.14.6",
     "react-redux": "^5.0.5",
     "react-redux-firebase": "^1.4.0-rc.2",

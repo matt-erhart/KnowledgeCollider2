@@ -52,7 +52,7 @@ export class ComplexDecorator extends React.Component<
           </EntityStock>
         );
       }
-      const stockName = props.decoratedText.replace(" s:", "");
+      const stockName = props.decoratedText.replace("s:", "");
       return (
         <StockSuggestion
           stockSuggestion={stockName}
@@ -81,7 +81,7 @@ export class ComplexDecorator extends React.Component<
     var currentContent = this.state.editorState.getCurrentContent();
     var currentContentBlock = currentContent.getBlockForKey(anchorKey);
     const text = currentContentBlock.getText();
-    const start = text.search("(^| )s:") + 1;
+    const start = text.search("s:");
     const tmpStr = text.substring(start, text.length);
     let end = tmpStr.search("($| )");
     end = end + start;
@@ -93,7 +93,7 @@ export class ComplexDecorator extends React.Component<
 
     const contentStateWithEntity = currentContent.createEntity(
       "stockItem",
-      "IMMUTABLE",
+      "MUTABLE",
       stockItem
     );
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
@@ -121,10 +121,15 @@ export class ComplexDecorator extends React.Component<
   editorStateChanged = newEditorState =>
     this.setState({ editorState: newEditorState });
 
+    componentDidMount(){
+      console.log(this.refs['editor'])
+    }
   render() {
     return (
-      <div className="editor">
+      <div className="editor" style={{width: '50vw', height: '100vh', margin: 0, padding: 0}}>
         <Draft.Editor
+          style={{width: '50vw', minHeight: '100vh', padding: 5,backgroundColor: 'lightgrey'}}
+          ref='editor'
           editorState={this.state.editorState}
           onChange={this.editorStateChanged}
         />
