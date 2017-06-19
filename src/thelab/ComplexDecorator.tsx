@@ -2,6 +2,7 @@ import * as React from "react";
 import * as Draft from "draft-js";
 import getSnippets, { snippet } from "./getSnippets";
 require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+import { storageRef, dbRef } from "../redux/configureStore";
 
 interface ComplexDecoratorState {
   editorState: Draft.EditorState;
@@ -132,6 +133,10 @@ export class ComplexDecorator extends React.Component<
     getSnippets.take(1).subscribe(snippets => {
       this.setState({ snippets });
     });
+    dbRef.ref("snippets").on("child_added", snapshot => {
+      const newSnippet = snapshot.val();
+      this.setState({ snippets: this.state.snippets.concat(newSnippet) });
+    });
   }
   render() {
     return (
@@ -154,15 +159,15 @@ export class ComplexDecorator extends React.Component<
           />
         </div>
 
-        <div style={{ flex: 1, backgroundColor: "silver", minHeight: "100vh" }}>
+        {/*<div style={{ flex: 1, backgroundColor: "silver", minHeight: "100vh" }}>
           <ul>
             {this.state.snippets &&
-              this.state.snippets.map(snippet => {
-                return <li>{snippet.snippet}</li>;
+              this.state.snippets.map( (snippet,i) => {
+                return <li key={i}>{snippet.snippet}</li>;
               })}
 
           </ul>
-        </div>
+        </div>*/}
       </div>
     );
   }
@@ -190,8 +195,19 @@ export class StockSuggestion extends React.Component<
   };
 
   componentDidMount() {
-    getSnippets.take(1).subscribe(snippets => {
-      this.setState({ snippets });
+    // getSnippets.take(1).subscribe(snippets => {
+    //   console.log(snippets)
+    //   this.setState({ snippets });
+    // });
+
+    dbRef.ref("snippets").on("child_added", snapshot => {
+      let val = snapshot.val();
+      console.log(val)
+      storageRef.child(val.imgPath).getDownloadURL().then(url => {
+        val.id = snapshot.key;
+        val.downloadUrl = url;
+        this.setState({ snippets: this.state.snippets.concat(val) });
+      });
     });
 
     this.GetStockSugestions(this.props.stockSuggestion);
