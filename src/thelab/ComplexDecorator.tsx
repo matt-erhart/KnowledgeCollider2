@@ -1,8 +1,11 @@
 import * as React from "react";
 import * as Draft from "draft-js";
-import getSnippets, {snippet} from './getSnippets'
+import getSnippets, { snippet } from "./getSnippets";
+require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+
 interface ComplexDecoratorState {
   editorState: Draft.EditorState;
+  snippets: snippet[];
 }
 
 export class ComplexDecorator extends React.Component<
@@ -39,9 +42,11 @@ export class ComplexDecorator extends React.Component<
     };
 
     // tslint:disable-next-line:no-shadowed-variable
-    const stockItemComponent = (
-      props: { decoratedText: string; entityKey: string; children: any }
-    ) => {
+    const stockItemComponent = (props: {
+      decoratedText: string;
+      entityKey: string;
+      children: any;
+    }) => {
       if (props.entityKey) {
         var currentContent = this.state.editorState.getCurrentContent();
         const instance = currentContent.getEntity(props.entityKey);
@@ -72,6 +77,7 @@ export class ComplexDecorator extends React.Component<
 
     this.state = {
       editorState: Draft.EditorState.createEmpty(compositeDecorator),
+      snippets: []
     };
   }
 
@@ -121,18 +127,42 @@ export class ComplexDecorator extends React.Component<
   editorStateChanged = newEditorState =>
     this.setState({ editorState: newEditorState });
 
-    componentDidMount(){
-      console.log(this.refs['editor'])
-    }
+  componentDidMount() {
+    (this.refs["editor"] as any).focus();
+    getSnippets.take(1).subscribe(snippets => {
+      this.setState({ snippets });
+    });
+  }
   render() {
     return (
-      <div className="editor" style={{width: '50vw', height: '100vh', margin: 0, padding: 0}}>
-        <Draft.Editor
-          style={{width: '50vw', minHeight: '100vh', padding: 5,backgroundColor: 'lightgrey'}}
-          ref='editor'
-          editorState={this.state.editorState}
-          onChange={this.editorStateChanged}
-        />
+      <div
+        className="editor"
+        style={{ display: "flex", alignItems: "stretch" }}
+      >
+        <div
+          style={{ flex: 1, minHeight: "100vh" }}
+          onClick={e => {
+            (this.refs["editor"] as any).focus();
+          }}
+        >
+          <Draft.Editor
+            style={{ flex: 1, minHeight: "100vh" }}
+            placeHolder={":"}
+            ref="editor"
+            editorState={this.state.editorState}
+            onChange={this.editorStateChanged}
+          />
+        </div>
+
+        <div style={{ flex: 1, backgroundColor: "silver", minHeight: "100vh" }}>
+          <ul>
+            {this.state.snippets &&
+              this.state.snippets.map(snippet => {
+                return <li>{snippet.snippet}</li>;
+              })}
+
+          </ul>
+        </div>
       </div>
     );
   }
@@ -145,7 +175,7 @@ interface StockSuggestionProps {
 
 interface StockSuggestionState {
   snippets: snippet[];
-   stockItems: snippet[];
+  stockItems: snippet[];
   isOpened: boolean;
 }
 
@@ -153,16 +183,16 @@ export class StockSuggestion extends React.Component<
   StockSuggestionProps,
   StockSuggestionState
 > {
-  state = { 
-      stockItems: Array<snippet>(), 
-            isOpened: false,
-            snippets: [],
-     };
+  state = {
+    stockItems: Array<snippet>(),
+    isOpened: false,
+    snippets: []
+  };
 
   componentDidMount() {
-      getSnippets.take(1).subscribe(snippets => {
-          this.setState({snippets})
-      })
+    getSnippets.take(1).subscribe(snippets => {
+      this.setState({ snippets });
+    });
 
     this.GetStockSugestions(this.props.stockSuggestion);
   }
@@ -211,7 +241,7 @@ const StockItem = (props: snippet) =>
   <div className="stockDetail">
     <div><strong>{props.comment}</strong></div>
     <div>Snippet: {props.snippet}</div>
-    <img src={props.downloadUrl} width={500} height={500}/>
+    <img src={props.downloadUrl} width={500} height={500} />
   </div>;
 
 class EntityStock extends React.Component<

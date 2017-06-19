@@ -1522,6 +1522,14 @@ draft-js-plugins-editor@^2.0.0-rc2:
     prop-types "^15.5.8"
     union-class-names "^1.0.0"
 
+draft-js@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/draft-js/-/draft-js-0.10.1.tgz#6f1219d8095729691429ca6fd7a58d2a8be5cb67"
+  dependencies:
+    fbjs "^0.8.7"
+    immutable "~3.7.4"
+    object-assign "^4.1.0"
+
 draftjs-utils@^0.7.5:
   version "0.7.5"
   resolved "https://registry.yarnpkg.com/draftjs-utils/-/draftjs-utils-0.7.5.tgz#982b671bf9b8296c89b05683e63257817d30de55"
@@ -3784,6 +3792,10 @@ re-base@^2.7.0:
   resolved "https://registry.yarnpkg.com/re-base/-/re-base-2.8.0.tgz#f911a431b997bfaefd55fcfa012ba948eff20884"
   dependencies:
     firebase "^3.5.2"
+
+react-absolute-grid@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-absolute-grid/-/react-absolute-grid-3.0.0.tgz#0d0370102059851f266e83dd979023663a86ee99"
 
 react-autosize-textarea@^0.4.3:
   version "0.4.4"

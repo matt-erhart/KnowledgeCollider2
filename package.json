@@ -49,6 +49,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "d3": "^4.8.0",
+    "draft-js": "^0.10.1",
     "draft-js-hashtag-plugin": "^2.0.0-beta1",
     "draft-js-linkify-plugin": "^2.0.0-beta1",
     "draft-js-mention-plugin": "^2.0.0-rc2",
@@ -59,6 +60,7 @@
     "prop-types": "^15.5.8",
     "re-base": "^2.7.0",
     "react": "^15.5.4",
+    "react-absolute-grid": "^3.0.0",
     "react-autosize-textarea": "^0.4.3",
     "react-dom": "^15.5.4",
     "react-draft-wysiwyg": "^1.10.0",
