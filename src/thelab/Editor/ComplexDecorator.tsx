@@ -17,6 +17,7 @@ export class ComplexDecorator extends React.Component<
   null,
   ComplexDecoratorState
 > {
+  compositeDecorator;
   constructor(props: any) {
     super(props);
     // tslint:disable-next-line:no-shadowed-variable
@@ -47,7 +48,7 @@ export class ComplexDecorator extends React.Component<
       );
     };
 
-    const compositeDecorator = new Draft.CompositeDecorator([
+    this.compositeDecorator = new Draft.CompositeDecorator([
       {
         strategy: snippetRegexStrategy,
         component: stockItemComponent
@@ -55,7 +56,7 @@ export class ComplexDecorator extends React.Component<
     ]);
 
     this.state = {
-      editorState: Draft.EditorState.createEmpty(compositeDecorator),
+      editorState: Draft.EditorState.createEmpty(this.compositeDecorator),
       snippets: []
     };
   }
@@ -125,15 +126,25 @@ export class ComplexDecorator extends React.Component<
         <div
           style={{ flex: 1, minHeight: "100vh" }}
           onClick={e => {
-            (this.refs["editor"] as any).focus();
+            {
+              /*(this.refs["editor"] as any).focus();*/
+            }
           }}
         >
-          <Draft.Editor
+          {/*<Draft.Editor
             style={{ flex: 1, minHeight: "100vh" }}
             placeHolder={":"}
             ref="editor"
             editorState={this.state.editorState}
             onChange={this.editorStateChanged}
+          />*/}
+          <Editor
+            editorState={this.state.editorState}
+            toolbarClassName="home-toolbar"
+            wrapperClassName="home-wrapper"
+            editorClassName="home-editor"
+            onEditorStateChange={this.editorStateChanged}
+            customDecorators={this.compositeDecorator._decorators}
           />
 
         </div>
