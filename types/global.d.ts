@@ -10,3 +10,15 @@ declare module '*.css' {
 declare interface Window {
   devToolsExtension?(): (args?: any) => any;
 }
+
+declare interface snippet {
+  comment: string;
+  created: string;
+  imgPath: string;
+  snippet: string;
+  title: string;
+  url: string;
+  downloadUrl?: any; //of the image.
+  id?: string;
+  goal?: string;
+}

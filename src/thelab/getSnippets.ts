@@ -2,16 +2,6 @@ import { storageRef, dbRef } from "../redux/configureStore";
 import * as _ from "lodash";
 import * as Rx from "rxjs";
 
-export interface snippet {
-  comment: string;
-  created: string;
-  imgPath: string;
-  snippet: string;
-  title: string;
-  url: string;
-  downloadUrl?: any; //of the image.
-  id?: string;
-}
 
 let snippets = dbRef.ref("snippets").orderByKey().once("value");
 

@@ -5,7 +5,7 @@ import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-u
 import createMentionPlugin, { defaultSuggestionsFilter } from "draft-js-mention-plugin"; // eslint-disable-line import/no-unresolved
 // import mentions from "./mentions";
 import styled from "styled-components";
-import getSnippets from "./getSnippets";
+import getSnippets from "../getSnippets";
 import { fromJS } from "immutable";
 
 const EditorCss = styled.div`
