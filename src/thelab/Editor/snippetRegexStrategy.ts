@@ -2,7 +2,8 @@ import * as Draft from "draft-js";
 
 export default (
   block: Draft.ContentBlock,
-  callback: (start: number, end: number) => void
+  callback: (start: number, end: number) => void,
+  contentState
 ) => {
   block.findEntityRanges(
     val => {
@@ -10,7 +11,6 @@ export default (
       if (!entityKey) {
         return false;
       }
-      const contentState = this.state.editorState.getCurrentContent();
       return contentState.getEntity(entityKey).getType() === "stockItem";
     },
     (start, end) => callback(start, end)
