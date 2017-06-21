@@ -8,14 +8,14 @@ import snippetRegexStrategy from "./snippetRegexStrategy";
 import { SnippetEntity, Snippet } from "./SnippetEntity";
 import { SnippetSuggestion } from "./SnippetSuggestions";
 
-interface ComplexDecoratorState {
+interface SnippetDecoratorState {
   editorState: Draft.EditorState;
   snippets: snippet[];
 }
 
-export class ComplexDecorator extends React.Component<
+export class SnippetDecorator extends React.Component<
   null,
-  ComplexDecoratorState
+  SnippetDecoratorState
 > {
   compositeDecorator;
   constructor(props: any) {
@@ -118,26 +118,10 @@ export class ComplexDecorator extends React.Component<
     });
   }
   render() {
+    const { snippets } = this.state;
     return (
-      <div
-        className="editor"
-        style={{ display: "flex", alignItems: "stretch" }}
-      >
-        <div
-          style={{ flex: 1, minHeight: "100vh" }}
-          onClick={e => {
-            {
-              /*(this.refs["editor"] as any).focus();*/
-            }
-          }}
-        >
-          {/*<Draft.Editor
-            style={{ flex: 1, minHeight: "100vh" }}
-            placeHolder={":"}
-            ref="editor"
-            editorState={this.state.editorState}
-            onChange={this.editorStateChanged}
-          />*/}
+      <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
+        <div className="home-wrapper" style={{ flex: 1 }}>
           <Editor
             editorState={this.state.editorState}
             toolbarClassName="home-toolbar"
@@ -146,6 +130,43 @@ export class ComplexDecorator extends React.Component<
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
           />
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            borderColor: "black",
+            overflow: "scroll",
+            border: "1px solid black"
+          }}
+        >
+          {snippets &&
+            snippets.map(snippet => {
+              return (
+                <div style={{ display: "flex", border: "1px solid darkgrey" }}>
+                  <div style={{ flex: 0 }}>
+                    <img
+                      src={snippet.downloadUrl}
+                      style={{ maxWidth: "200px", maxHeight: "auto" }}
+                    />
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <ul>
+                      <li> <b>Snippet:</b>   {snippet.snippet} </li>
+                      <li><b>Comment:</b> {snippet.comment} </li>
+                      <li><b>Page Title:</b> {snippet.title} </li>
+                      <li> <a href={snippet.url}> <b>Page URL</b> </a> </li>
+                      <li><b>Goal:</b> {snippet.goal} </li>
+                      <li><b>Date:</b> {snippet.created} </li>
+
+                    </ul>
+
+                  </div>
+
+                </div>
+              );
+            })}
 
         </div>
       </div>
