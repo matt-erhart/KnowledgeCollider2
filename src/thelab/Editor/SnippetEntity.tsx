@@ -4,7 +4,7 @@ export const Snippet = (props: snippet) =>
   <div className="stockDetail">
     <div><strong>{props.comment}</strong></div>
     <div>Snippet: {props.snippet}</div>
-    <img src={props.downloadUrl} width={500} height={500} />
+    <img src={props.downloadUrl} style={{ maxWidth: "500px", maxHeight: "auto" }} />
   </div>;
 
 
