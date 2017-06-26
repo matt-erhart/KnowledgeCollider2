@@ -1,14 +1,7 @@
 import * as React from "react";
+import {SnippetEntityHoverDetails} from './SnippetEntityHoverDetails'
 
-export const Snippet = (props: snippet) =>
-  <div >
-    <div><strong>{props.comment}</strong></div>
-    <div>Created: {props.created}</div>
-    <div>Snippet: {props.snippet}</div>
-    <img src={props.downloadUrl} style={{ maxWidth: "500px", maxHeight: "auto" }} />
-  </div>;
-
-
+//in the editor
 export class SnippetEntity extends React.Component<
   { snippet: snippet },
   { hovering: boolean }
@@ -17,7 +10,7 @@ export class SnippetEntity extends React.Component<
   render() {
     return (
       <span>
-        <span
+        <span style={{color: 'blue'}}
           className="stockItem"
           onMouseEnter={() => this.setState({ hovering: true })}
           onMouseLeave={() => this.setState({ hovering: false })}
@@ -26,7 +19,7 @@ export class SnippetEntity extends React.Component<
         </span>
         {this.state.hovering &&
           <div className="stockItemHover">
-            <Snippet {...this.props.snippet} />
+            <SnippetEntityHoverDetails {...this.props.snippet} />
           </div>}
       </span>
     );

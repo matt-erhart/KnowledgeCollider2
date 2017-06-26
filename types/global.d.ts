@@ -1,5 +1,4 @@
 /** Global definitions for developement **/
-
 // for style loader
 declare module '*.css' {
   const styles: any;
@@ -12,13 +11,13 @@ declare interface Window {
 }
 
 declare interface snippet {
-  comment: string;
-  created: string;
-  imgPath: string;
-  snippet: string;
-  title: string;
-  url: string;
-  downloadUrl?: any; //of the image.
-  id?: string;
-  goal?: string;
+  comment: string; //written by user
+  created: string; //momentjs date of creation
+  imgPath: string; //firebase imgPath used to get downloadUrl
+  snippet: string; //copied text during snippet creation
+  title: string; //title of website
+  url: string; //url of website
+  downloadUrl?: any; //of the image. img scr=downloadUrl
+  id?: string; //generate by js
+  goal?: string; //added by user
 }

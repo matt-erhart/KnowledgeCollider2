@@ -5,8 +5,9 @@ import { Editor } from "react-draft-wysiwyg";
 require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
 import { storageRef, dbRef } from "../../redux/configureStore";
 import snippetRegexStrategy from "./snippetRegexStrategy";
-import { SnippetEntity, Snippet } from "./SnippetEntity";
-import { SnippetSuggestion } from "./SnippetSuggestions";
+import { SnippetEntity } from "./SnippetEntity";
+import { SnippetEntityHoverDetails } from "./SnippetEntityHoverDetails";
+import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
 
 interface SnippetDecoratorState {
@@ -22,7 +23,7 @@ export class SnippetDecorator extends React.Component<
   compositeDecorator;
   constructor(props: any) {
     super(props);
-    // tslint:disable-next-line:no-shadowed-variable
+    //get entity data and pass to snippetentity
     const snippetItemComponent = (props: {
       decoratedText: string;
       entityKey: string;
@@ -41,12 +42,12 @@ export class SnippetDecorator extends React.Component<
       }
       const snippetName = props.decoratedText.replace("s:", "");
       return (
-        <SnippetSuggestion
+        <SnippetSuggestionListInEditor
           SnippetSuggestion={snippetName}
           SnippetClicked={this.snippetClicked}
         >
           {props.children}
-        </SnippetSuggestion>
+        </SnippetSuggestionListInEditor>
       );
     };
 
@@ -126,11 +127,10 @@ export class SnippetDecorator extends React.Component<
   render() {
     const { snippets } = this.state;
     return (
-      <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }} >
+      <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
 
         <SkyLightStateless
-          
-          hideOnOverlayClicked 
+          hideOnOverlayClicked
           dialogStyles={{
             width: "90%",
             height: "90%",
@@ -173,10 +173,10 @@ export class SnippetDecorator extends React.Component<
           }}
         >
           {snippets &&
-            snippets.reverse().map(snippet => {
+            snippets.map((snippet,i) => {
               return (
                 <div
-                  key={snippet.id}
+                  key={i}
                   style={{ display: "flex", border: "1px solid darkgrey" }}
                 >
                   <div style={{ flex: 0 }}>
