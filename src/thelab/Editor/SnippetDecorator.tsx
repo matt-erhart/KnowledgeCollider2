@@ -173,7 +173,7 @@ export class SnippetDecorator extends React.Component<
           }}
         >
           {snippets &&
-            snippets.map(snippet => {
+            snippets.reverse().map(snippet => {
               return (
                 <div
                   key={snippet.id}
