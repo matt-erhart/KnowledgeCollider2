@@ -1,8 +1,9 @@
 import * as React from "react";
 
 export const Snippet = (props: snippet) =>
-  <div className="stockDetail">
+  <div >
     <div><strong>{props.comment}</strong></div>
+    <div>Created: {props.created}</div>
     <div>Snippet: {props.snippet}</div>
     <img src={props.downloadUrl} style={{ maxWidth: "500px", maxHeight: "auto" }} />
   </div>;

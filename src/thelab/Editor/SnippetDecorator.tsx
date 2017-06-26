@@ -7,10 +7,12 @@ import { storageRef, dbRef } from "../../redux/configureStore";
 import snippetRegexStrategy from "./snippetRegexStrategy";
 import { SnippetEntity, Snippet } from "./SnippetEntity";
 import { SnippetSuggestion } from "./SnippetSuggestions";
+import { SkyLightStateless } from "react-skylight";
 
 interface SnippetDecoratorState {
   editorState: Draft.EditorState;
   snippets: snippet[];
+  showImage: string;
 }
 
 export class SnippetDecorator extends React.Component<
@@ -21,7 +23,7 @@ export class SnippetDecorator extends React.Component<
   constructor(props: any) {
     super(props);
     // tslint:disable-next-line:no-shadowed-variable
-    const stockItemComponent = (props: {
+    const snippetItemComponent = (props: {
       decoratedText: string;
       entityKey: string;
       children: any;
@@ -51,13 +53,14 @@ export class SnippetDecorator extends React.Component<
     this.compositeDecorator = new Draft.CompositeDecorator([
       {
         strategy: snippetRegexStrategy,
-        component: stockItemComponent
+        component: snippetItemComponent
       }
     ]);
 
     this.state = {
       editorState: Draft.EditorState.createEmpty(this.compositeDecorator),
-      snippets: []
+      snippets: [],
+      showImage: ""
     };
   }
 
@@ -116,11 +119,34 @@ export class SnippetDecorator extends React.Component<
       const newSnippet = snapshot.val();
       this.setState({ snippets: this.state.snippets.concat(newSnippet) });
     });
+    // document.addEventListener("keydown", e =>{
+    //   console.log(e)
+    // })
   }
   render() {
     const { snippets } = this.state;
     return (
-      <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
+      <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }} >
+
+        <SkyLightStateless
+          
+          hideOnOverlayClicked 
+          dialogStyles={{
+            width: "90%",
+            height: "90%",
+            left: "2%",
+            top: "2%",
+            marginTop: "0",
+            marginLeft: "0",
+            overflow: "scroll"
+          }}
+          isVisible={this.state.showImage.length > 0}
+          onCloseClicked={() => {
+            this.setState({ showImage: "" });
+          }}
+        >
+          <img src={this.state.showImage} style={{}} />
+        </SkyLightStateless>
         <div
           className="home-wrapper"
           style={{ flex: 1 }}
@@ -134,6 +160,7 @@ export class SnippetDecorator extends React.Component<
             editorClassName="home-editor"
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
+            placeholder={"use 's:text in snippet' to search snippets "}
           />
         </div>
 
@@ -148,11 +175,21 @@ export class SnippetDecorator extends React.Component<
           {snippets &&
             snippets.map(snippet => {
               return (
-                <div style={{ display: "flex", border: "1px solid darkgrey" }}>
+                <div
+                  key={snippet.id}
+                  style={{ display: "flex", border: "1px solid darkgrey" }}
+                >
                   <div style={{ flex: 0 }}>
                     <img
+                      onClick={e => {
+                        this.setState({ showImage: snippet.downloadUrl });
+                      }}
                       src={snippet.downloadUrl}
-                      style={{ maxWidth: "200px", maxHeight: "auto" }}
+                      style={{
+                        maxWidth: "200px",
+                        maxHeight: "auto",
+                        cursor: "pointer"
+                      }}
                     />
                   </div>
 

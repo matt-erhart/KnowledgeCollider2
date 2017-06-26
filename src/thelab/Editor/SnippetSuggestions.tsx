@@ -1,6 +1,7 @@
 import * as React from 'React'
 import { storageRef, dbRef } from "../../redux/configureStore";
 import {Snippet} from './SnippetEntity'
+import * as moment from 'moment'
 
 interface SnippetSuggestionProps {
   SnippetSuggestion: string;
@@ -11,6 +12,7 @@ interface SnippetSuggestionState {
   snippets: snippet[];
   SnippetItems: snippet[];
   isOpened: boolean;
+  dbLoaded: boolean;
 }
 
 export class SnippetSuggestion extends React.Component<
@@ -20,13 +22,13 @@ export class SnippetSuggestion extends React.Component<
   state = {
     SnippetItems: Array<snippet>(),
     isOpened: false,
-    snippets: []
+    snippets: [],
+    dbLoaded: false
   };
 
   componentDidMount() {
     dbRef.ref("snippets").on("child_added", snapshot => {
       let val = snapshot.val();
-      console.log(val)
       storageRef.child(val.imgPath).getDownloadURL().then(url => {
         val.id = snapshot.key;
         val.downloadUrl = url;
@@ -43,11 +45,18 @@ export class SnippetSuggestion extends React.Component<
     }
   }
 
-  async GetSnippetSugestions(sugestion: string) {
-    const items = await filterSnippets(sugestion, this.state.snippets);
+  GetSnippetSugestions(suggestion: string) {
+    // const items = await filterSnippets(sugestion, this.state.snippets);
+    const items = this.state.snippets.filter(
+        s => s.snippet.toLowerCase().indexOf(suggestion.toLowerCase()) >= 0
+      );
+    console.log(items)
     if (items.length > 0) {
-      this.state.isOpened = true;
+      this.setState({isOpened: true})
     }
+    items.sort(function (left, right) {
+      return moment.utc(left.created).diff(moment.utc(right.created))
+    }).reverse();
     this.setState({ SnippetItems: items });
   }
 
