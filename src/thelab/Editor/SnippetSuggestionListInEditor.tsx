@@ -39,13 +39,16 @@ export class SnippetSuggestionListInEditor extends React.Component<
         val.id = snapshot.key;
         val.downloadUrl = url;
         this.setState({ snippets: this.state.snippets.concat(val) });
+        const snippets = snippetSortFilter(sortFilterConfig, this.state.snippets);
+        this.setState({ filteredSnippets: snippets, isOpened: true });
       });
     });
   }
 
   componentWillReceiveProps(nextProp: SnippetSuggestionProps) {
+          console.log(nextProp.SnippetSuggestion, this.props.SnippetSuggestion);
+
     if (nextProp.SnippetSuggestion !== this.props.SnippetSuggestion) {
-      console.log(nextProp.SnippetSuggestion, this.props.SnippetSuggestion);
       const sortFilterConfig = {
         searchTerms: this.props.SnippetSuggestion,
         sortByDate: true,

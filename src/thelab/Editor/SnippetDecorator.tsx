@@ -41,6 +41,7 @@ export class SnippetDecorator extends React.Component<
         );
       }
       const snippetName = props.decoratedText.replace("s:", "");
+      console.log('snipopetname',snippetName)
       return (
         <SnippetSuggestionListInEditor
           SnippetSuggestion={snippetName}
