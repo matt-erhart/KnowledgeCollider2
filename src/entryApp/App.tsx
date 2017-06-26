@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 // import { RootState } from "../redux/reducers";
 // import { Header, MainSection } from "../components";
-import { SnippetGrid } from "../thelab/SnippetBrowser/SnippetGrid";
 import {SnippetDecorator} from "../thelab/Editor/SnippetDecorator";
 export namespace App {
   export interface Props {

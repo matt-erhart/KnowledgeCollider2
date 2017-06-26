@@ -121,8 +121,13 @@ export class SnippetDecorator extends React.Component<
     const { snippets } = this.state;
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
-        <div className="home-wrapper" style={{ flex: 1 }}>
+        <div
+          className="home-wrapper"
+          style={{ flex: 1 }}
+          onClick={e => (this.refs.editor as any).editor.focus()}
+        >
           <Editor
+            ref="editor"
             editorState={this.state.editorState}
             toolbarClassName="home-toolbar"
             wrapperClassName="home-wrapper"
@@ -156,14 +161,13 @@ export class SnippetDecorator extends React.Component<
                       <li> <b>Snippet:</b>   {snippet.snippet} </li>
                       <li><b>Comment:</b> {snippet.comment} </li>
                       <li><b>Page Title:</b> {snippet.title} </li>
-                      <li> <a href={snippet.url}> <b>Page URL</b> </a> </li>
+                      <li>
+                        {" "}<a href={snippet.url}> <b>Page URL</b> </a>{" "}
+                      </li>
                       <li><b>Goal:</b> {snippet.goal} </li>
                       <li><b>Date:</b> {snippet.created} </li>
-
                     </ul>
-
                   </div>
-
                 </div>
               );
             })}
