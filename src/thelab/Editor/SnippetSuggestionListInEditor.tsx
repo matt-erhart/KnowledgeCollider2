@@ -39,15 +39,16 @@ export class SnippetSuggestionListInEditor extends React.Component<
         val.id = snapshot.key;
         val.downloadUrl = url;
         this.setState({ snippets: this.state.snippets.concat(val) });
-        const snippets = snippetSortFilter(sortFilterConfig, this.state.snippets);
+        const snippets = snippetSortFilter(
+          sortFilterConfig,
+          this.state.snippets
+        );
         this.setState({ filteredSnippets: snippets, isOpened: true });
       });
     });
   }
 
   componentWillReceiveProps(nextProp: SnippetSuggestionProps) {
-          console.log(nextProp.SnippetSuggestion, this.props.SnippetSuggestion);
-
     if (nextProp.SnippetSuggestion !== this.props.SnippetSuggestion) {
       const sortFilterConfig = {
         searchTerms: this.props.SnippetSuggestion,
@@ -76,7 +77,7 @@ export class SnippetSuggestionListInEditor extends React.Component<
             <ul contentEditable={false}>
               {filteredSnippets.map(s =>
                 <li onClick={() => this.SnippetClicked(s)} key={s.id}>
-                  <SnippetEntityHoverDetails {...s} />
+                  <SnippetEntityHoverDetails {...s} searchTerm={this.props.SnippetSuggestion} />
                 </li>
               )}
             </ul>
