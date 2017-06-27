@@ -1,7 +1,8 @@
 import * as React from "react";
 import ReactHtmlParser from "react-html-parser";
 
-const Highlight = (text, term) => {
+//todo: move hightlight out
+export const Highlight = (text, term) => {
   const html = text
     .toLowerCase()
     .replace(

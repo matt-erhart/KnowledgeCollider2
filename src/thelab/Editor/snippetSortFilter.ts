@@ -1,14 +1,20 @@
 import * as moment from "moment";
 
-interface SnippetSortFilter {
+export interface SnippetSortFilter {
   searchTerms?: string; //space seperated
   sortByDate?: Boolean;
   recentDatesFirst?: Boolean;
 }
 
+export const defaults: SnippetSortFilter = {
+  searchTerms: "",
+  sortByDate: true,
+  recentDatesFirst: true
+};
+
 export const snippetSortFilter = (
-  sortFilter: SnippetSortFilter,
-  snippets: snippet[]
+  sortFilter: SnippetSortFilter = defaults,
+  snippets: snippet[] = []
 ): snippet[] => {
   const searchTermsArray = sortFilter.searchTerms.match(/\w+/g); //seperate by spaces
   if (searchTermsArray.length < 1) return [];

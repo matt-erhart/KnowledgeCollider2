@@ -9,6 +9,8 @@ import { SnippetEntity } from "./SnippetEntity";
 import { SnippetEntityHoverDetails } from "./SnippetEntityHoverDetails";
 import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
+import * as Rx from 'rxjs'
+import {SnippetList} from './SnippetList'
 
 interface SnippetDecoratorState {
   editorState: Draft.EditorState;
@@ -23,6 +25,8 @@ export class SnippetDecorator extends React.Component<
   compositeDecorator;
   constructor(props: any) {
     super(props);
+    this.imgClick = this.imgClick.bind(this)
+
     //get entity data and pass to snippetentity
     const snippetItemComponent = (props: {
       decoratedText: string;
@@ -113,19 +117,33 @@ export class SnippetDecorator extends React.Component<
     this.setState({ editorState: newEditorState });
 
   componentDidMount() {
-    // (this.refs["editor"] as any).focus();
-    getSnippets.take(1).subscribe(snippets => {
-      this.setState({ snippets });
-    });
+    // dbRef.ref("snippets").on("child_added", snapshot => {
+    //   const newSnippet = snapshot.val();
+    //   this.setState({ snippets: this.state.snippets.concat(newSnippet) });
+    // });
     dbRef.ref("snippets").on("child_added", snapshot => {
-      const newSnippet = snapshot.val();
-      this.setState({ snippets: this.state.snippets.concat(newSnippet) });
+      let val = snapshot.val();
+      storageRef.child(val.imgPath).getDownloadURL().then(url => {
+        val.id = snapshot.key;
+        val.downloadUrl = url;
+        this.setState({ snippets: this.state.snippets.concat(val) });
+        // const snippets = snippetSortFilter(
+        //   sortFilterConfig,
+        //   this.state.snippets
+        // );
+        // this.setState({ filteredSnippets: snippets, isOpened: true });
+      });
     });
-    // document.addEventListener("keydown", e =>{
-    //   console.log(e)
-    // })
+
   }
+
+  imgClick(snippet) {
+    this.setState({ showImage: snippet.downloadUrl })
+  }
+
   render() {
+    console.log('func?',this.imgClick)
+
     const { snippets } = this.state;
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
@@ -164,53 +182,9 @@ export class SnippetDecorator extends React.Component<
             placeholder={"use 's:text in snippet' to search snippets "}
           />
         </div>
+        {this.state.snippets && 
+        <SnippetList handleImgClick={this.imgClick} snippets={this.state.snippets}/>}
 
-        <div
-          style={{
-            flex: 1,
-            borderColor: "black",
-            overflow: "scroll",
-            border: "1px solid black"
-          }}
-        >
-          {snippets &&
-            snippets.map((snippet,i) => {
-              return (
-                <div
-                  key={i}
-                  style={{ display: "flex", border: "1px solid darkgrey" }}
-                >
-                  <div style={{ flex: 0 }}>
-                    <img
-                      onClick={e => {
-                        this.setState({ showImage: snippet.downloadUrl });
-                      }}
-                      src={snippet.downloadUrl}
-                      style={{
-                        maxWidth: "200px",
-                        maxHeight: "auto",
-                        cursor: "pointer"
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <ul>
-                      <li> <b>Snippet:</b>   {snippet.snippet} </li>
-                      <li><b>Comment:</b> {snippet.comment} </li>
-                      <li><b>Page Title:</b> {snippet.title} </li>
-                      <li>
-                        {" "}<a href={snippet.url}> <b>Page URL</b> </a>{" "}
-                      </li>
-                      <li><b>Goal:</b> {snippet.goal} </li>
-                      <li><b>Date:</b> {snippet.created} </li>
-                    </ul>
-                  </div>
-                </div>
-              );
-            })}
-
-        </div>
       </div>
     );
   }
