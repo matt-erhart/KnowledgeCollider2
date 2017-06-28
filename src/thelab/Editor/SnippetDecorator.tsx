@@ -1,16 +1,30 @@
 import * as React from "react";
 import * as Draft from "draft-js";
 import getSnippets from "../getSnippets";
-import { Editor } from "react-draft-wysiwyg";
-require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+// import { Editor } from "react-draft-wysiwyg";
+// require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+require("!style-loader!css-loader!draft-js-inline-toolbar-plugin/lib/plugin.css");
+
 import { storageRef, dbRef } from "../../redux/configureStore";
 import snippetRegexStrategy from "./snippetRegexStrategy";
 import { SnippetEntity } from "./SnippetEntity";
 import { SnippetEntityHoverDetails } from "./SnippetEntityHoverDetails";
 import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
-import * as Rx from 'rxjs'
-import {SnippetList} from './SnippetList'
+import * as Rx from "rxjs";
+import { SnippetList } from "./SnippetList";
+import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-unresolved
+import createInlineToolbarPlugin from "draft-js-inline-toolbar-plugin";
+const inlineToolbarPlugin = createInlineToolbarPlugin();
+const { InlineToolbar } = inlineToolbarPlugin;
+const plugins = [inlineToolbarPlugin];
+import {hexColorDecorator} from './DecoratorWithProps'
+console.log(hexColorDecorator)
+
+import highlight from './highlight'
+const highlightPlugin = highlight({
+  background: 'purple'
+});
 
 interface SnippetDecoratorState {
   editorState: Draft.EditorState;
@@ -22,10 +36,11 @@ export class SnippetDecorator extends React.Component<
   null,
   SnippetDecoratorState
 > {
+  editor
   compositeDecorator;
   constructor(props: any) {
     super(props);
-    this.imgClick = this.imgClick.bind(this)
+    // this.imgClick = this.imgClick.bind(this)
 
     //get entity data and pass to snippetentity
     const snippetItemComponent = (props: {
@@ -45,7 +60,6 @@ export class SnippetDecorator extends React.Component<
         );
       }
       const snippetName = props.decoratedText.replace("s:", "");
-      console.log('snipopetname',snippetName)
       return (
         <SnippetSuggestionListInEditor
           SnippetSuggestion={snippetName}
@@ -64,7 +78,7 @@ export class SnippetDecorator extends React.Component<
     ]);
 
     this.state = {
-      editorState: Draft.EditorState.createEmpty(this.compositeDecorator),
+      editorState: Draft.EditorState.createEmpty(hexColorDecorator),
       snippets: [],
       showImage: ""
     };
@@ -134,20 +148,16 @@ export class SnippetDecorator extends React.Component<
         // this.setState({ filteredSnippets: snippets, isOpened: true });
       });
     });
-
   }
 
   imgClick(snippet) {
-    this.setState({ showImage: snippet.downloadUrl })
+    this.setState({ showImage: snippet.downloadUrl });
   }
 
   render() {
-    console.log('func?',this.imgClick)
-
     const { snippets } = this.state;
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
-
         <SkyLightStateless
           hideOnOverlayClicked
           dialogStyles={{
@@ -171,7 +181,7 @@ export class SnippetDecorator extends React.Component<
           style={{ flex: 1 }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
-          <Editor
+          {/*<Editor
             ref="editor"
             editorState={this.state.editorState}
             toolbarClassName="home-toolbar"
@@ -180,11 +190,19 @@ export class SnippetDecorator extends React.Component<
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
             placeholder={"use 's:text in snippet' to search snippets "}
+          />*/}
+          <Editor
+             ref='editor'
+            editorState={this.state.editorState}
+            onChange={this.editorStateChanged}
+            decorators={[hexColorDecorator]}
           />
         </div>
-        {this.state.snippets && 
-        <SnippetList handleImgClick={this.imgClick} snippets={this.state.snippets}/>}
-
+        {this.state.snippets &&
+          <SnippetList
+            handleImgClick={this.imgClick.bind(this)}
+            snippets={this.state.snippets}
+          />}
       </div>
     );
   }

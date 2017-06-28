@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export const SnippetList = ({ snippets, handleImgClick }) => {
-  console.log(snippets, handleImgClick)
+  // console.log(snippets, handleImgClick)
   return (
     <div
       style={{
@@ -13,7 +13,7 @@ export const SnippetList = ({ snippets, handleImgClick }) => {
     >
       {snippets.length > 0 &&
         snippets.map((snippet, i) => {
-          console.log(snippet)
+          {/*console.log(snippet)*/}
           return (
             <div
               key={i}
