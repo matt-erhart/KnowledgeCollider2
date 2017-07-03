@@ -186,6 +186,7 @@ console.log(this.state)
           style={{ flex: 1 }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
+        <a href="https://github.com/matt-erhart/KCExtension/tree/master/build">Updated Chrome Extension Build</a>
           <Editor
             ref="editor"
             editorState={this.state.editorState}
