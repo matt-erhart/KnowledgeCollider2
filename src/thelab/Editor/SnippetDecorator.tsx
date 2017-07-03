@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as Draft from "draft-js";
 import getSnippets from "../getSnippets";
-// import { Editor } from "react-draft-wysiwyg";
-// require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
-require("!style-loader!css-loader!draft-js-inline-toolbar-plugin/lib/plugin.css");
+import { Editor } from "react-draft-wysiwyg";
+require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+// require("!style-loader!css-loader!draft-js-inline-toolbar-plugin/lib/plugin.css");
 
 import { storageRef, dbRef } from "../../redux/configureStore";
 import snippetRegexStrategy from "./snippetRegexStrategy";
@@ -13,36 +13,35 @@ import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
 import * as Rx from "rxjs";
 import { SnippetList } from "./SnippetList";
-import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-unresolved
+// import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-unresolved
 import createInlineToolbarPlugin from "draft-js-inline-toolbar-plugin";
 const inlineToolbarPlugin = createInlineToolbarPlugin();
 const { InlineToolbar } = inlineToolbarPlugin;
 const plugins = [inlineToolbarPlugin];
-import {hexColorDecorator} from './DecoratorWithProps'
-console.log(hexColorDecorator)
+import { hexColorDecorator } from "./DecoratorWithProps";
+import { snippetSortFilter } from "./snippetSortFilter";
 
-import highlight from './highlight'
+import highlight from "./highlight";
 const highlightPlugin = highlight({
-  background: 'purple'
+  background: "purple"
 });
 
 interface SnippetDecoratorState {
   editorState: Draft.EditorState;
   snippets: snippet[];
   showImage: string;
+  sortFilter: { searchTerms: string; project: string; user: string };
 }
 
 export class SnippetDecorator extends React.Component<
   null,
   SnippetDecoratorState
 > {
-  editor
+  editor;
   compositeDecorator;
   constructor(props: any) {
     super(props);
-    // this.imgClick = this.imgClick.bind(this)
 
-    //get entity data and pass to snippetentity
     const snippetItemComponent = (props: {
       decoratedText: string;
       entityKey: string;
@@ -59,7 +58,7 @@ export class SnippetDecorator extends React.Component<
           </SnippetEntity>
         );
       }
-      const snippetName = props.decoratedText.replace("s:", "");
+      const snippetName = props.decoratedText.replace("@", "");
       return (
         <SnippetSuggestionListInEditor
           SnippetSuggestion={snippetName}
@@ -80,7 +79,8 @@ export class SnippetDecorator extends React.Component<
     this.state = {
       editorState: Draft.EditorState.createEmpty(hexColorDecorator),
       snippets: [],
-      showImage: ""
+      showImage: "",
+      sortFilter: { searchTerms: "", project: "", user: "" }
     };
   }
 
@@ -90,7 +90,7 @@ export class SnippetDecorator extends React.Component<
     var currentContent = this.state.editorState.getCurrentContent();
     var currentContentBlock = currentContent.getBlockForKey(anchorKey);
     const text = currentContentBlock.getText();
-    const start = text.search("s:");
+    const start = text.search("@");
     const tmpStr = text.substring(start, text.length);
     let end = tmpStr.search("($| )");
     end = end + start;
@@ -153,9 +153,14 @@ export class SnippetDecorator extends React.Component<
   imgClick(snippet) {
     this.setState({ showImage: snippet.downloadUrl });
   }
+  handleSortFilter(e, field) {
+    this.setState({sortFilter: {...this.state.sortFilter, [field]: (e.nativeEvent.srcElement as any).value}})
+  }
 
   render() {
-    const { snippets } = this.state;
+console.log(this.state)
+    const snippets = snippetSortFilter(this.state.sortFilter, this.state.snippets)
+    console.log(snippets)
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
         <SkyLightStateless
@@ -181,7 +186,7 @@ export class SnippetDecorator extends React.Component<
           style={{ flex: 1 }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
-          {/*<Editor
+          <Editor
             ref="editor"
             editorState={this.state.editorState}
             toolbarClassName="home-toolbar"
@@ -189,21 +194,22 @@ export class SnippetDecorator extends React.Component<
             editorClassName="home-editor"
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
-            placeholder={"use 's:text in snippet' to search snippets "}
-          />*/}
-          <Editor
+            placeholder={"use '@text in snippet' to search snippets "}
+          />
+          {/*<Editor
              ref='editor'
             editorState={this.state.editorState}
             onChange={this.editorStateChanged}
             decorators={[hexColorDecorator]}
-          />
+          />*/}
         </div>
         {this.state.snippets &&
           <SnippetList
             handleImgClick={this.imgClick.bind(this)}
-            snippets={this.state.snippets}
+            snippets={snippets}
+            handleSortFilter={this.handleSortFilter.bind(this)}
           />}
-      </div>
+          </div>
     );
   }
 }

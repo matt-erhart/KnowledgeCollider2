@@ -31,7 +31,9 @@ export class SnippetSuggestionListInEditor extends React.Component<
     const sortFilterConfig = {
       searchTerms: this.props.SnippetSuggestion,
       sortByDate: true,
-      recentDatesFirst: true
+      recentDatesFirst: true,
+      user: '',
+      project: '',
     };
     dbRef.ref("snippets").on("child_added", snapshot => {
       let val = snapshot.val();
@@ -53,7 +55,9 @@ export class SnippetSuggestionListInEditor extends React.Component<
       const sortFilterConfig = {
         searchTerms: this.props.SnippetSuggestion,
         sortByDate: true,
-        recentDatesFirst: true
+        recentDatesFirst: true,
+              user: '',
+      project: '',
       };
       const snippets = snippetSortFilter(sortFilterConfig, this.state.snippets);
       console.log(snippets);

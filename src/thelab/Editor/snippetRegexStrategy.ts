@@ -18,7 +18,7 @@ export default (
 
   const text = block.getText();
   let result: RegExpExecArray;
-  let regex = /(^|\s)s:\w+/g;
+  let regex = /(^|\s)@\w+/g;
   while ((result = regex.exec(text) as RegExpExecArray) != null) {
     let start = result.index;
     let end = start + result[0].length;

@@ -20,4 +20,7 @@ declare interface snippet {
   downloadUrl?: any; //of the image. img scr=downloadUrl
   id?: string; //generate by js
   goal?: string; //added by user
+  purpose?: string;
+  project?: string;
+  user?: string
 }
