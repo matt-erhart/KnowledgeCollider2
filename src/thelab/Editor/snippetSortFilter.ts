@@ -18,6 +18,8 @@ export const snippetSortFilter = (
   sortFilter: SnippetSortFilter = defaults,
   snippets: snippet[] = []
 ): snippet[] => {
+  sortFilter.sortByDate = true;
+  sortFilter.recentDatesFirst = true;
   let searchTermsArray = sortFilter.searchTerms.match(/\w+/g); //seperate by spaces
   // if (!searchTermsArray) searchTermsArray = [];
   const searchString = (str: string, search: string) => {
@@ -50,15 +52,15 @@ export const snippetSortFilter = (
 
   if (sortFilter.sortByDate) {
     if (sortFilter.recentDatesFirst) {
-      return filteredSnippets.sort(function(left, right) {
-        return moment.utc(right.created).diff(moment.utc(left.created));
+      let sorted = filteredSnippets.sort(function(left, right) {
+        return moment.utc(right.created, "MMMM Do YYYY, h:mm:ss a").diff(moment.utc(left.created, "MMMM Do YYYY, h:mm:ss a"));
       });
-    } else {
+      
+    } else {"June 11th 2017, 11:33:01 am"
       return filteredSnippets.sort(function(left, right) {
-        return moment.utc(left.created).diff(moment.utc(right.created));
+        return moment.utc(left.created, "MMMM Do YYYY, h:mm:ss a").diff(moment.utc(right.created, "MMMM Do YYYY, h:mm:ss a"));
       });
     }
   }
-
   return filteredSnippets;
 };
