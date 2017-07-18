@@ -20,6 +20,7 @@ const { InlineToolbar } = inlineToolbarPlugin;
 const plugins = [inlineToolbarPlugin];
 import { hexColorDecorator } from "./DecoratorWithProps";
 import { snippetSortFilter } from "./snippetSortFilter";
+import { contentState, createWithRawContent } from "./utils";
 
 import highlight from "./highlight";
 const highlightPlugin = highlight({
@@ -127,26 +128,20 @@ export class SnippetDecorator extends React.Component<
     this.setState({ editorState: editorStateToUpdate });
   };
 
-  editorStateChanged = newEditorState =>
+  editorStateChanged = newEditorState => {
     this.setState({ editorState: newEditorState });
+  };
 
   componentDidMount() {
-    // dbRef.ref("snippets").on("child_added", snapshot => {
-    //   const newSnippet = snapshot.val();
-    //   this.setState({ snippets: this.state.snippets.concat(newSnippet) });
-    // });
     dbRef.ref("snippets").on("child_added", snapshot => {
       let val = snapshot.val();
-      storageRef.child(val.imgPath).getDownloadURL().then(url => {
-        val.id = snapshot.key;
-        val.downloadUrl = url;
-        this.setState({ snippets: this.state.snippets.concat(val) });
-        // const snippets = snippetSortFilter(
-        //   sortFilterConfig,
-        //   this.state.snippets
-        // );
-        // this.setState({ filteredSnippets: snippets, isOpened: true });
-      });
+      if (val.imgPath) {
+        storageRef.child(val.imgPath).getDownloadURL().then(url => {
+          val.id = snapshot.key;
+          val.downloadUrl = url;
+          this.setState({ snippets: this.state.snippets.concat(val) });
+        });
+      }
     });
   }
 
@@ -154,13 +149,30 @@ export class SnippetDecorator extends React.Component<
     this.setState({ showImage: snippet.downloadUrl });
   }
   handleSortFilter(e, field) {
-    this.setState({sortFilter: {...this.state.sortFilter, [field]: (e.nativeEvent.srcElement as any).value}})
+    this.setState({
+      sortFilter: {
+        ...this.state.sortFilter,
+        [field]: (e.nativeEvent.srcElement as any).value
+      }
+    });
+  }
+  handleSave(e) {
+    const serializedState = contentState(this.state.editorState);
+    dbRef.ref().child("draftjs").push(serializedState)
   }
 
+  handleLoad = (e) => {
+    dbRef.ref().child("draftjs/-KpMdhRbSMGDLVl5bmAi").once('value', (snapshot) => {
+      const draftJson = JSON.parse(snapshot.val().jsonStr);
+          this.setState({ editorState: createWithRawContent(draftJson)});
+    })
+  };
+
   render() {
-console.log(this.state)
-    const snippets = snippetSortFilter(this.state.sortFilter, this.state.snippets)
-    console.log(snippets)
+    const snippets = snippetSortFilter(
+      this.state.sortFilter,
+      this.state.snippets
+    );
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
         <SkyLightStateless
@@ -186,7 +198,25 @@ console.log(this.state)
           style={{ flex: 1 }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
-        <a href="https://github.com/matt-erhart/KCExtension/tree/master/build">Updated Chrome Extension Build</a>
+          <a href="https://github.com/matt-erhart/KCExtension/tree/master/build">
+            Updated Chrome Extension Build
+          </a>
+          <button
+            style={{ marginLeft: "5px" }}
+            onClick={e => {
+              this.handleSave(e);
+            }}
+          >
+            Save{" "}
+          </button>
+          <button
+            style={{ marginLeft: "5px" }}
+            onClick={e => {
+              this.handleLoad(e);
+            }}
+          >
+            Load
+          </button>
           <Editor
             ref="editor"
             editorState={this.state.editorState}
@@ -210,7 +240,7 @@ console.log(this.state)
             snippets={snippets}
             handleSortFilter={this.handleSortFilter.bind(this)}
           />}
-          </div>
+      </div>
     );
   }
 }
