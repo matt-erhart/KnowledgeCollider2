@@ -21,7 +21,7 @@ const plugins = [inlineToolbarPlugin];
 import { hexColorDecorator } from "./DecoratorWithProps";
 import { snippetSortFilter } from "./snippetSortFilter";
 import { contentState, createWithRawContent } from "./utils";
-
+import { Route, Switch, Link, Redirect, withRouter } from "react-router-dom";
 import highlight from "./highlight";
 const highlightPlugin = highlight({
   background: "purple"
@@ -32,12 +32,25 @@ interface SnippetDecoratorState {
   snippets: snippet[];
   showImage: string;
   sortFilter: { searchTerms: string; project: string; user: string };
+  dbKey: string;
+  title: string;
 }
 
-export class SnippetDecorator extends React.Component<
-  null,
-  SnippetDecoratorState
-> {
+class FirebaseKeyThenLink extends React.Component<null, { key: string }> {
+  componentWillMount() {
+    this.setState({ key: dbRef.ref().child("draftjs").push().key });
+  }
+
+  render() {
+    return (
+      <div>
+        {this.state.key}
+      </div>
+    );
+  }
+}
+
+class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   editor;
   compositeDecorator;
   constructor(props: any) {
@@ -81,7 +94,9 @@ export class SnippetDecorator extends React.Component<
       editorState: Draft.EditorState.createEmpty(hexColorDecorator),
       snippets: [],
       showImage: "",
-      sortFilter: { searchTerms: "", project: "", user: "" }
+      sortFilter: { searchTerms: "", project: "", user: "" },
+      dbKey: "",
+      title: ""
     };
   }
 
@@ -133,6 +148,12 @@ export class SnippetDecorator extends React.Component<
   };
 
   componentDidMount() {
+    if (this.props.match.params.key) {
+      this.handleLoad(this.props.match.params.key);
+    }
+    if (this.props.match.params.title) {
+      this.setState({ title: this.props.match.params.title });
+    }
     dbRef.ref("snippets").on("child_added", snapshot => {
       let val = snapshot.val();
       if (val.imgPath) {
@@ -143,6 +164,7 @@ export class SnippetDecorator extends React.Component<
         });
       }
     });
+    console.log(this.state, this.props);
   }
 
   imgClick(snippet) {
@@ -158,14 +180,25 @@ export class SnippetDecorator extends React.Component<
   }
   handleSave(e) {
     const serializedState = contentState(this.state.editorState);
-    dbRef.ref().child("draftjs").push(serializedState)
+    const urlAndTitleStateTheSame =
+      this.state.title === this.props.match.params.title;
+
+      console.log(this.state.dbKey,this.state.title,this.props.match.params.title)
+    if (this.state.dbKey && urlAndTitleStateTheSame) {
+      dbRef.ref().child("draftjs/" + this.state.dbKey).set(serializedState);
+    } else {
+      const key = dbRef.ref().child("draftjs").push(serializedState).key;
+      this.props.history.push("/" + this.state.title + "/" + key);
+      this.setState({ dbKey: key });
+    }
   }
 
-  handleLoad = (e) => {
-    dbRef.ref().child("draftjs/-KpMdhRbSMGDLVl5bmAi").once('value', (snapshot) => {
+  handleLoad = key => {
+    dbRef.ref().child("draftjs/" + key).once("value", snapshot => {
       const draftJson = JSON.parse(snapshot.val().jsonStr);
-          this.setState({ editorState: createWithRawContent(draftJson)});
-    })
+      this.setState({dbKey: key})
+      this.setState({ editorState: createWithRawContent(draftJson) });
+    });
   };
 
   render() {
@@ -201,14 +234,24 @@ export class SnippetDecorator extends React.Component<
           <a href="https://github.com/matt-erhart/KCExtension/tree/master/build">
             Updated Chrome Extension Build
           </a>
-          <button
-            style={{ marginLeft: "5px" }}
-            onClick={e => {
+          <form
+            onSubmit={e => {
+              e.preventDefault();
               this.handleSave(e);
             }}
           >
-            Save{" "}
-          </button>
+            <button type="submit" style={{ marginLeft: "5px" }}>
+              Save
+            </button>
+            <input
+              type="text"
+              placeholder="url safe title"
+              name="title"
+              onChange={e => this.setState({ title: e.target.value })}
+              value={this.state.title}
+              onClick={e => e.stopPropagation()}
+            />
+          </form>
           <button
             style={{ marginLeft: "5px" }}
             onClick={e => {
@@ -227,12 +270,6 @@ export class SnippetDecorator extends React.Component<
             customDecorators={this.compositeDecorator._decorators}
             placeholder={"use '@text in snippet' to search snippets "}
           />
-          {/*<Editor
-             ref='editor'
-            editorState={this.state.editorState}
-            onChange={this.editorStateChanged}
-            decorators={[hexColorDecorator]}
-          />*/}
         </div>
         {this.state.snippets &&
           <SnippetList
@@ -244,3 +281,5 @@ export class SnippetDecorator extends React.Component<
     );
   }
 }
+
+export default withRouter(SnippetDecorator);
