@@ -57,6 +57,7 @@ class FirebaseKeyThenLink extends React.Component<null, { key: string }> {
 class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   editor;
   compositeDecorator;
+  defaultState;
   constructor(props: any) {
     super(props);
 
@@ -94,7 +95,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       }
     ]);
 
-    this.state = {
+    this.defaultState = {
       editorState: Draft.EditorState.createEmpty(hexColorDecorator),
       snippets: [],
       showImage: "",
@@ -103,6 +104,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       title: "",
       sessions: []
     };
+    this.state = this.defaultState;
   }
 
   snippetClicked = (snippet: snippet) => {
@@ -195,11 +197,6 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     const urlAndTitleStateTheSame =
       this.state.title === this.props.match.params.title;
 
-    console.log(
-      this.state.dbKey,
-      this.state.title,
-      this.props.match.params.title
-    );
     if (this.state.dbKey && urlAndTitleStateTheSame) {
       dbRef.ref().child("draftjs/" + this.state.dbKey).set(serializedState);
     } else {
@@ -213,12 +210,22 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     dbRef.ref().child("draftjs/" + key).once("value", snapshot => {
       const draftJson = JSON.parse(snapshot.val().jsonStr);
       this.setState({ dbKey: key });
-      this.setState({title: snapshot.val().title})
+      this.setState({ title: snapshot.val().title });
       this.setState({ editorState: createWithRawContent(draftJson) });
       this.props.history.push("/" + snapshot.val().title + "/" + key);
     });
   };
-
+  deleteSession = () => {
+    dbRef.ref().child("draftjs/" + this.state.dbKey).remove();
+    this.setState({
+      editorState: Draft.EditorState.createEmpty(hexColorDecorator),
+      sessions: this.state.sessions.filter(
+        session => session.key !== this.state.dbKey
+      )
+    });
+    this.setState({ dbKey: "", title: "" });
+    this.props.history.push("/");
+  };
 
   render() {
     const snippets = snippetSortFilter(
@@ -271,15 +278,24 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
               onClick={e => e.stopPropagation()}
             />
           </form>
-          <select onClick={e=>e.stopPropagation()} value={this.state.dbKey} onChange={e=>this.handleLoad(e.target.value)}>
-            {this.state.sessions && this.state.sessions.map((session,i) => {
-              return (
-                <option key={i} value={session.key}>
-                  {session.title}
-                </option>
-              );
-            })}
-          </select>
+          
+            <select
+            onClick={e => e.stopPropagation()}
+            value={this.state.dbKey}
+            onChange={e => this.handleLoad(e.target.value)}
+          >
+           <option disabled> -- load session -- </option>
+            {(this.state.sessions && this.state.sessions.length > 0) &&
+              this.state.sessions.map((session, i) => {
+                return (
+                  <option key={i} value={session.key}>
+                    {session.title}
+                  </option>
+                );
+              })}
+              </select>
+          
+          <button onClick={e => this.deleteSession()}>Delete</button>
           <Editor
             ref="editor"
             editorState={this.state.editorState}
