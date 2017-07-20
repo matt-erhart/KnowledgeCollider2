@@ -26,7 +26,10 @@ import highlight from "./highlight";
 const highlightPlugin = highlight({
   background: "purple"
 });
-
+interface Session {
+  title: string;
+  key: string;
+}
 interface SnippetDecoratorState {
   editorState: Draft.EditorState;
   snippets: snippet[];
@@ -34,6 +37,7 @@ interface SnippetDecoratorState {
   sortFilter: { searchTerms: string; project: string; user: string };
   dbKey: string;
   title: string;
+  sessions: Session[];
 }
 
 class FirebaseKeyThenLink extends React.Component<null, { key: string }> {
@@ -96,7 +100,8 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       showImage: "",
       sortFilter: { searchTerms: "", project: "", user: "" },
       dbKey: "",
-      title: ""
+      title: "",
+      sessions: []
     };
   }
 
@@ -164,7 +169,13 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
         });
       }
     });
-    console.log(this.state, this.props);
+    dbRef.ref("draftjs").on("child_added", snapshot => {
+      const session: Session = {
+        title: snapshot.val().title,
+        key: snapshot.key
+      };
+      this.setState({ sessions: this.state.sessions.concat(session) });
+    });
   }
 
   imgClick(snippet) {
@@ -179,11 +190,16 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     });
   }
   handleSave(e) {
-    const serializedState = contentState(this.state.editorState);
+    let serializedState = contentState(this.state.editorState);
+    (serializedState as any).title = this.state.title;
     const urlAndTitleStateTheSame =
       this.state.title === this.props.match.params.title;
 
-      console.log(this.state.dbKey,this.state.title,this.props.match.params.title)
+    console.log(
+      this.state.dbKey,
+      this.state.title,
+      this.props.match.params.title
+    );
     if (this.state.dbKey && urlAndTitleStateTheSame) {
       dbRef.ref().child("draftjs/" + this.state.dbKey).set(serializedState);
     } else {
@@ -196,10 +212,13 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   handleLoad = key => {
     dbRef.ref().child("draftjs/" + key).once("value", snapshot => {
       const draftJson = JSON.parse(snapshot.val().jsonStr);
-      this.setState({dbKey: key})
+      this.setState({ dbKey: key });
+      this.setState({title: snapshot.val().title})
       this.setState({ editorState: createWithRawContent(draftJson) });
+      this.props.history.push("/" + snapshot.val().title + "/" + key);
     });
   };
+
 
   render() {
     const snippets = snippetSortFilter(
@@ -252,14 +271,15 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
               onClick={e => e.stopPropagation()}
             />
           </form>
-          <button
-            style={{ marginLeft: "5px" }}
-            onClick={e => {
-              this.handleLoad(e);
-            }}
-          >
-            Load
-          </button>
+          <select onClick={e=>e.stopPropagation()} value={this.state.dbKey} onChange={e=>this.handleLoad(e.target.value)}>
+            {this.state.sessions && this.state.sessions.map((session,i) => {
+              return (
+                <option key={i} value={session.key}>
+                  {session.title}
+                </option>
+              );
+            })}
+          </select>
           <Editor
             ref="editor"
             editorState={this.state.editorState}
