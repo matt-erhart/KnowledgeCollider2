@@ -133,7 +133,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     const newContnentState = Draft.Modifier.replaceText(
       contentStateWithEntity,
       partialSelection,
-      snippet.comment || 'Snippet',
+      '[' + snippet.comment + ']',
       undefined,
       entityKey
     );
