@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as Draft from "draft-js";
-import getSnippets from "../getSnippets";
 import { Editor } from "react-draft-wysiwyg";
-require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css"); // eslint-disable-line import/no-unresolved
+require("!style-loader!css-loader!react-draft-wysiwyg/dist/react-draft-wysiwyg.css");
 // require("!style-loader!css-loader!draft-js-inline-toolbar-plugin/lib/plugin.css");
 
 import { storageRef, dbRef } from "../../redux/configureStore";
@@ -13,19 +12,12 @@ import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
 import * as Rx from "rxjs";
 import { SnippetList } from "./SnippetList";
-// import Editor from "draft-js-plugins-editor"; // eslint-disable-line import/no-unresolved
-import createInlineToolbarPlugin from "draft-js-inline-toolbar-plugin";
-const inlineToolbarPlugin = createInlineToolbarPlugin();
-const { InlineToolbar } = inlineToolbarPlugin;
-const plugins = [inlineToolbarPlugin];
+
 import { hexColorDecorator } from "./DecoratorWithProps";
 import { snippetSortFilter } from "./snippetSortFilter";
 import { contentState, createWithRawContent } from "./utils";
-import { Route, Switch, Link, Redirect, withRouter } from "react-router-dom";
-import highlight from "./highlight";
-const highlightPlugin = highlight({
-  background: "purple"
-});
+import { withRouter } from "react-router-dom";
+
 interface Session {
   title: string;
   key: string;
@@ -38,20 +30,6 @@ interface SnippetDecoratorState {
   dbKey: string;
   title: string;
   sessions: Session[];
-}
-
-class FirebaseKeyThenLink extends React.Component<null, { key: string }> {
-  componentWillMount() {
-    this.setState({ key: dbRef.ref().child("draftjs").push().key });
-  }
-
-  render() {
-    return (
-      <div>
-        {this.state.key}
-      </div>
-    );
-  }
 }
 
 class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
@@ -81,7 +59,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       return (
         <SnippetSuggestionListInEditor
           SnippetSuggestion={snippetName}
-          SnippetClicked={this.snippetClicked}
+          SnippetClicked={this.createSnippetEntity}
         >
           {props.children}
         </SnippetSuggestionListInEditor>
@@ -107,8 +85,10 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     this.state = this.defaultState;
   }
 
-  snippetClicked = (snippet: snippet) => {
+  createSnippetEntity = (snippet: snippet) => {
     const selectionState = this.state.editorState.getSelection();
+    var selectionStart = selectionState.getStartOffset();
+    var selectionEnd = selectionState.getEndOffset();
     var anchorKey = selectionState.getAnchorKey();
     var currentContent = this.state.editorState.getCurrentContent();
     var currentContentBlock = currentContent.getBlockForKey(anchorKey);
@@ -118,22 +98,28 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     let end = tmpStr.search("($| )");
     end = end + start;
 
-    const partialSelection = selectionState.merge({
+    let partialSelection = selectionState.merge({
       anchorOffset: start,
       focusOffset: end
     }) as Draft.SelectionState;
 
+    const noSelection = selectionStart === selectionEnd;
+    const selection = noSelection ? partialSelection : selectionState;
+    const newText = noSelection
+      ? "-" + snippet.comment
+      : text.slice(selectionStart, selectionEnd);
+
     const contentStateWithEntity = currentContent.createEntity(
       "stockItem",
-      "MUTABLE",
+      noSelection? "MUTABLE" : "IMMUTABLE",
       snippet
     );
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 
     const newContnentState = Draft.Modifier.replaceText(
       contentStateWithEntity,
-      partialSelection,
-      '[' + snippet.comment + ']',
+      selection,
+      newText,
       undefined,
       entityKey
     );
@@ -191,6 +177,10 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       }
     });
   }
+  handleAttachEntity = snippet => {
+    const selection = this.state.editorState.getSelection();
+    console.log(selection, snippet);
+  };
   handleSave(e) {
     let serializedState = contentState(this.state.editorState);
     (serializedState as any).title = this.state.title;
@@ -278,14 +268,15 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
               onClick={e => e.stopPropagation()}
             />
           </form>
-          
-            <select
+
+          <select
             onClick={e => e.stopPropagation()}
             value={this.state.dbKey}
             onChange={e => this.handleLoad(e.target.value)}
           >
-           <option disabled> -- load session -- </option>
-            {(this.state.sessions && this.state.sessions.length > 0) &&
+            <option disabled> -- load session -- </option>
+            {this.state.sessions &&
+              this.state.sessions.length > 0 &&
               this.state.sessions.map((session, i) => {
                 return (
                   <option key={i} value={session.key}>
@@ -293,8 +284,8 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
                   </option>
                 );
               })}
-              </select>
-          
+          </select>
+
           <button onClick={e => this.deleteSession()}>Delete</button>
           <Editor
             ref="editor"
@@ -312,6 +303,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             handleImgClick={this.imgClick.bind(this)}
             snippets={snippets}
             handleSortFilter={this.handleSortFilter.bind(this)}
+            handleAttachEntity={this.createSnippetEntity}
           />}
       </div>
     );

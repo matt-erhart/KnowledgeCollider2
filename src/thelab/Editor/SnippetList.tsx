@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export const SnippetList = ({ snippets, handleImgClick, handleSortFilter }) => {
+export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handleAttachEntity }) => {
   // console.log(snippets, handleImgClick)
   return (
     <div
@@ -83,6 +83,9 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter }) => {
                     <b>Date:</b> {snippet.created}{" "}
                   </li>
                 </ul>
+                <button onClick={e=>handleAttachEntity(snippet)}>Add to selected text</button>
+                <button>Edit</button>
+                <button>Delete</button>
               </div>
             </div>
           );
