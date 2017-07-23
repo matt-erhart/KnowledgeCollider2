@@ -1,6 +1,13 @@
 import * as React from "react";
-import SnippetCard from './SnippetCard'
-export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handleAttachEntity }) => {
+import SnippetCard from "./SnippetCard";
+import TextField from "material-ui/TextField";
+import * as _ from 'lodash'
+export const SnippetList = ({
+  snippets,
+  handleImgClick,
+  handleSortFilter,
+  handleAttachEntity
+}) => {
   // console.log(snippets, handleImgClick)
   return (
     <div
@@ -12,7 +19,21 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
       }}
     >
       <div style={{ display: "flex" }}>
-        <input
+        {_.map(['user','project', 'searchTerms'], (val, i) => {
+            return (
+              <TextField
+              style={{ flex: 1, paddingTop: 0 }}
+                key={i}
+                floatingLabelText={val}
+                multiLine={false}
+                fullWidth={false}
+                onChange={e => handleSortFilter(e, val)}
+
+              />
+            );
+          })}
+
+        {/* <input
           style={{ flex: 1 }}
           type="text"
           placeholder="user"
@@ -29,7 +50,7 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
           type="text"
           placeholder="searchTerms"
           onChange={e => handleSortFilter(e, "searchTerms")}
-        />
+        /> */}
       </div>
 
       {snippets.length > 0 &&
@@ -58,7 +79,11 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
               </div> */}
 
               <div style={{ flex: 1 }}>
-                <SnippetCard snippet={snippet} handleImgClick={handleImgClick}></SnippetCard>
+                <SnippetCard
+                  snippet={snippet}
+                  handleImgClick={handleImgClick}
+                  handleAttachEntity={handleAttachEntity}
+                />
                 {/* <ul>
                   <li>
                     {" "}<b>Snippet:</b> {snippet.snippet}{" "}
@@ -84,9 +109,8 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
                     <b>Date:</b> {snippet.created}{" "}
                   </li>
                 </ul>
-                <button onClick={e=>handleAttachEntity(snippet)}>Add to selected text</button>
-                <button>Edit</button>
-                <button>Delete</button> */}
+                */}
+
               </div>
             </div>
           );

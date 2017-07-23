@@ -9,10 +9,30 @@ import {
 } from "material-ui/Card";
 import FlatButton from "material-ui/FlatButton";
 import Toggle from "material-ui/Toggle";
-
+import TextField from "material-ui/TextField";
+import * as _ from "lodash";
 interface props {
   snippet: snippet;
 }
+
+const Subtitle = (props) => {
+  return (
+    <div>
+       <span><b style={{ color: "#0080ff" }}>Comment: </b> {props.snippet.comment || 'None'} </span>
+      <div><b style={{ color: "#4d4dff" }}> Snippet: </b>{props.snippet.snippet}</div>
+      <div> {props.snippet.created} </div>
+      <FlatButton
+      backgroundColor='WhiteSmoke'
+      hoverColor='#0080ff'
+              label="Attach to text"
+              onTouchTap={e => {
+                e.stopPropagation();
+                props.handleAttachEntity(props.snippet);
+              }}
+            /> 
+    </div>
+  );
+};
 
 export default class CardExampleControlled extends React.Component<any, any> {
   constructor(props) {
@@ -34,12 +54,15 @@ export default class CardExampleControlled extends React.Component<any, any> {
       <Card>
         <CardHeader
           title={`${user}/${project}/${purpose}/${title}`}
-          subtitle={`${comment} | ${snippet}`}
+          subtitle={<Subtitle snippet={this.props.snippet} handleAttachEntity={this.props.handleAttachEntity} />}
           actAsExpander={true}
           showExpandableButton={true}
           avatar={
             <img
-              onClick={() => this.props.handleImgClick(this.props.snippet)}
+              onClick={e => {
+                e.stopPropagation();
+                this.props.handleImgClick(this.props.snippet);
+              }}
               src={downloadUrl}
               style={{
                 maxWidth: "100px",
@@ -48,17 +71,27 @@ export default class CardExampleControlled extends React.Component<any, any> {
             />
           }
         />
-
-        <CardText expandable={true} actAsExpander={true}>
-          <CardMedia expandable={true} overlay={<CardTitle title={created} />}>
-            <img src={this.props.snippet.downloadUrl} />
-          </CardMedia>
-          {snippet}
+        <CardText expandable={true}>
+            <FlatButton label={'Delete Snippet'} 
+            backgroundColor='orange'
+      hoverColor='red'
+            />
+          {_.map(this.props.snippet, (val, key) => {
+            return (
+              <TextField
+                key={key}
+                defaultValue={val as string}
+                floatingLabelText={key}
+                multiLine={true}
+                fullWidth={true}
+              />
+            );
+          })}
+          <FlatButton label={'Save edits'} 
+          backgroundColor='silver'
+      hoverColor='#0080ff'
+          />
         </CardText>
-        {/* <CardActions>
-          <FlatButton label="Expand" onTouchTap={this.handleExpand} />
-          <FlatButton label="Reduce" onTouchTap={this.handleReduce} />
-        </CardActions> */}
       </Card>
     );
   }
