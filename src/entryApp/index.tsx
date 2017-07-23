@@ -6,6 +6,8 @@ import { Provider } from "react-redux";
 import { configureStore } from "../redux/configureStore";
 import { App } from "./App";
 import { BrowserRouter as Router, Route, Switch, RouteComponentProps } from 'react-router-dom';
+var injectTapEventPlugin = require("react-tap-event-plugin");
+injectTapEventPlugin();
 const store = configureStore();
 // const history = createBrowserHistory();
 

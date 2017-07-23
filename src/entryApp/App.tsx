@@ -7,6 +7,8 @@ import { RouteComponentProps } from "react-router";
 // import { RootState } from "../redux/reducers";
 // import { Header, MainSection } from "../components";
 import SnippetDecorator from "../thelab/Editor/SnippetDecorator";
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+
 export namespace App {
   export interface Props {
     // todos: TodoItemData[];
@@ -22,10 +24,9 @@ export namespace App {
 export class App extends React.Component<null, null> {
   render() {
     return (
-      <div>
-      <SnippetDecorator/>
-
-      </div>
+      <MuiThemeProvider>
+        <SnippetDecorator />
+      </MuiThemeProvider>
     );
   }
 }

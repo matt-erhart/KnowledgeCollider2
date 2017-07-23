@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import SnippetCard from './SnippetCard'
 export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handleAttachEntity }) => {
   // console.log(snippets, handleImgClick)
   return (
@@ -42,7 +42,7 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
               key={i}
               style={{ display: "flex", border: "1px solid darkgrey" }}
             >
-              <div style={{ flex: 0 }}>
+              {/* <div style={{ flex: 0 }}>
                 {snippet.downloadUrl &&
                   <img
                     onClick={e => {
@@ -55,10 +55,11 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
                       cursor: "pointer"
                     }}
                   />}
-              </div>
+              </div> */}
 
               <div style={{ flex: 1 }}>
-                <ul>
+                <SnippetCard snippet={snippet} handleImgClick={handleImgClick}></SnippetCard>
+                {/* <ul>
                   <li>
                     {" "}<b>Snippet:</b> {snippet.snippet}{" "}
                   </li>
@@ -85,7 +86,7 @@ export const SnippetList = ({ snippets, handleImgClick, handleSortFilter, handle
                 </ul>
                 <button onClick={e=>handleAttachEntity(snippet)}>Add to selected text</button>
                 <button>Edit</button>
-                <button>Delete</button>
+                <button>Delete</button> */}
               </div>
             </div>
           );

@@ -12,6 +12,8 @@ import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
 import * as Rx from "rxjs";
 import { SnippetList } from "./SnippetList";
+import { snippetItemComponent } from "./SnippetItemComponent";
+// import {createSnippetEntity} from './createSnippetEntity'
 
 import { hexColorDecorator } from "./DecoratorWithProps";
 import { snippetSortFilter } from "./snippetSortFilter";
@@ -111,9 +113,10 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
 
     const contentStateWithEntity = currentContent.createEntity(
       "stockItem",
-      noSelection? "MUTABLE" : "IMMUTABLE",
+      noSelection ? "MUTABLE" : "IMMUTABLE",
       snippet
     );
+
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 
     const newContnentState = Draft.Modifier.replaceText(
@@ -166,9 +169,11 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     });
   }
 
-  imgClick(snippet) {
+  imgClick = (snippet) => {
+    console.log('yeaa', snippet)
     this.setState({ showImage: snippet.downloadUrl });
   }
+
   handleSortFilter(e, field) {
     this.setState({
       sortFilter: {
@@ -177,10 +182,12 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       }
     });
   }
+
   handleAttachEntity = snippet => {
     const selection = this.state.editorState.getSelection();
     console.log(selection, snippet);
   };
+
   handleSave(e) {
     let serializedState = contentState(this.state.editorState);
     (serializedState as any).title = this.state.title;
@@ -199,12 +206,12 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   handleLoad = key => {
     dbRef.ref().child("draftjs/" + key).once("value", snapshot => {
       const draftJson = JSON.parse(snapshot.val().jsonStr);
-      this.setState({ dbKey: key });
-      this.setState({ title: snapshot.val().title });
+      this.setState({ dbKey: key, title: snapshot.val().title });
       this.setState({ editorState: createWithRawContent(draftJson) });
       this.props.history.push("/" + snapshot.val().title + "/" + key);
     });
   };
+
   deleteSession = () => {
     dbRef.ref().child("draftjs/" + this.state.dbKey).remove();
     this.setState({
@@ -300,7 +307,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
         </div>
         {this.state.snippets &&
           <SnippetList
-            handleImgClick={this.imgClick.bind(this)}
+            handleImgClick={this.imgClick}
             snippets={snippets}
             handleSortFilter={this.handleSortFilter.bind(this)}
             handleAttachEntity={this.createSnippetEntity}
