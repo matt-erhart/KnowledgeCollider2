@@ -19,6 +19,7 @@ import { hexColorDecorator } from "./DecoratorWithProps";
 import { snippetSortFilter } from "./snippetSortFilter";
 import { contentState, createWithRawContent } from "./utils";
 import { withRouter } from "react-router-dom";
+import { EditorIO } from "./EditorIO";
 
 interface Session {
   title: string;
@@ -168,11 +169,14 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       this.setState({ sessions: this.state.sessions.concat(session) });
     });
   }
-
-  imgClick = (snippet) => {
-    console.log('yeaa', snippet)
-    this.setState({ showImage: snippet.downloadUrl });
+  componentWillUnmount() {
+    dbRef.goOffline();
   }
+
+  imgClick = snippet => {
+    console.log("yeaa", snippet);
+    this.setState({ showImage: snippet.downloadUrl });
+  };
 
   handleSortFilter(e, field) {
     this.setState({
@@ -188,7 +192,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     console.log(selection, snippet);
   };
 
-  handleSave(e) {
+  handleSave = (e) => {
     let serializedState = contentState(this.state.editorState);
     (serializedState as any).title = this.state.title;
     const urlAndTitleStateTheSame =
@@ -204,6 +208,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   }
 
   handleLoad = key => {
+    console.log(key);
     dbRef.ref().child("draftjs/" + key).once("value", snapshot => {
       const draftJson = JSON.parse(snapshot.val().jsonStr);
       this.setState({ dbKey: key, title: snapshot.val().title });
@@ -212,7 +217,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     });
   };
 
-  deleteSession = () => {
+  handleDelete = () => {
     dbRef.ref().child("draftjs/" + this.state.dbKey).remove();
     this.setState({
       editorState: Draft.EditorState.createEmpty(hexColorDecorator),
@@ -222,6 +227,9 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     });
     this.setState({ dbKey: "", title: "" });
     this.props.history.push("/");
+  };
+  setTitle = e => {
+    this.setState({ title: (e.target as any).value });
   };
 
   render() {
@@ -254,46 +262,14 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
           style={{ flex: 1 }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
-          <a href="https://github.com/matt-erhart/KCExtension/tree/master/build">
-            Updated Chrome Extension Build
-          </a>
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              this.handleSave(e);
-            }}
-          >
-            <button type="submit" style={{ marginLeft: "5px" }}>
-              Save
-            </button>
-            <input
-              type="text"
-              placeholder="url safe title"
-              name="title"
-              onChange={e => this.setState({ title: e.target.value })}
-              value={this.state.title}
-              onClick={e => e.stopPropagation()}
-            />
-          </form>
-
-          <select
-            onClick={e => e.stopPropagation()}
-            value={this.state.dbKey}
-            onChange={e => this.handleLoad(e.target.value)}
-          >
-            <option disabled> -- load session -- </option>
-            {this.state.sessions &&
-              this.state.sessions.length > 0 &&
-              this.state.sessions.map((session, i) => {
-                return (
-                  <option key={i} value={session.key}>
-                    {session.title}
-                  </option>
-                );
-              })}
-          </select>
-
-          <button onClick={e => this.deleteSession()}>Delete</button>
+          <EditorIO
+            title={this.state.title || ""}
+            setTitle={this.setTitle}
+            handleLoad={this.handleLoad}
+            handleSave={this.handleSave}
+            handleDelete={this.handleDelete}
+            sessions={this.state.sessions}
+          />
           <Editor
             ref="editor"
             editorState={this.state.editorState}

@@ -15,21 +15,40 @@ interface props {
   snippet: snippet;
 }
 
-const Subtitle = (props) => {
+const Subtitle = props => {
   return (
     <div>
-       <span><b style={{ color: "#0080ff" }}>Comment: </b> {props.snippet.comment || 'None'} </span>
-      <div><b style={{ color: "#4d4dff" }}> Snippet: </b>{props.snippet.snippet}</div>
-      <div> {props.snippet.created} </div>
+      <span>
+        <b style={{ color: "#7EB6FF" }}>Comment: </b>{" "}
+        {props.snippet.comment || "None"}{" "}
+      </span>
+      <div>
+        <b style={{ color: "#7EB6FF" }}> Snippet: </b>
+        {props.snippet.snippet}
+      </div>
+      <div>
+        {" "}{props.snippet.created}{" "}
+      </div>
       <FlatButton
-      backgroundColor='WhiteSmoke'
-      hoverColor='#0080ff'
-              label="Attach to text"
-              onTouchTap={e => {
-                e.stopPropagation();
-                props.handleAttachEntity(props.snippet);
-              }}
-            /> 
+        backgroundColor="WhiteSmoke"
+        hoverColor="#0080ff"
+        label="Attach to text"
+        onTouchTap={e => {
+          e.stopPropagation();
+          props.handleAttachEntity(props.snippet);
+        }}
+      />
+      <FlatButton
+        style={{ marginLeft: "5px" }}
+        backgroundColor="WhiteSmoke"
+        hoverColor="#0080ff"
+        label="Go to Source"
+        href={props.snippet.url}
+        target="_blank"
+        onTouchTap={e => {
+          e.stopPropagation();
+        }}
+      />
     </div>
   );
 };
@@ -54,28 +73,34 @@ export default class CardExampleControlled extends React.Component<any, any> {
       <Card>
         <CardHeader
           title={`${user}/${project}/${purpose}/${title}`}
-          subtitle={<Subtitle snippet={this.props.snippet} handleAttachEntity={this.props.handleAttachEntity} />}
+          subtitle={
+            <Subtitle
+              snippet={this.props.snippet}
+              handleAttachEntity={this.props.handleAttachEntity}
+            />
+          }
           actAsExpander={true}
           showExpandableButton={true}
           avatar={
-            <img
+             <img
               onClick={e => {
                 e.stopPropagation();
                 this.props.handleImgClick(this.props.snippet);
               }}
-              src={downloadUrl}
+              src={'asdf' || downloadUrl}
               style={{
                 maxWidth: "100px",
                 maxHeight: "200px"
               }}
-            />
-          }
+            /> 
+          } 
         />
         <CardText expandable={true}>
-            <FlatButton label={'Delete Snippet'} 
-            backgroundColor='orange'
-      hoverColor='red'
-            />
+          <FlatButton
+            label={"Delete Snippet"}
+            backgroundColor="orange"
+            hoverColor="red"
+          />
           {_.map(this.props.snippet, (val, key) => {
             return (
               <TextField
@@ -87,9 +112,10 @@ export default class CardExampleControlled extends React.Component<any, any> {
               />
             );
           })}
-          <FlatButton label={'Save edits'} 
-          backgroundColor='silver'
-      hoverColor='#0080ff'
+          <FlatButton
+            label={"Save edits"}
+            backgroundColor="silver"
+            hoverColor="#0080ff"
           />
         </CardText>
       </Card>

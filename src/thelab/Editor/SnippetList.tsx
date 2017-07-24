@@ -24,7 +24,7 @@ export const SnippetList = ({
               <TextField
               style={{ flex: 1, paddingTop: 0 }}
                 key={i}
-                floatingLabelText={val}
+                hintText={val}
                 multiLine={false}
                 fullWidth={false}
                 onChange={e => handleSortFilter(e, val)}
