@@ -17,6 +17,8 @@ import IconButton from "material-ui/IconButton";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import AppBar from "material-ui/AppBar";
 
+
+
 export class EditorIO extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -73,8 +75,7 @@ export class EditorIO extends React.Component<any, any> {
                   );
                 })}
           </IconMenu>
-          <FlatButton label="Delete" hoverColor='red'  onClick={e => handleDelete()}
-/>
+          <FlatButton label="Delete" hoverColor='red'  onClick={e => handleDelete()}/>    
         </form>
       </Card>
     );

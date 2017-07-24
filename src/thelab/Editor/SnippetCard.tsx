@@ -1,4 +1,6 @@
 import * as React from "react";
+import { storageRef, dbRef } from "../../redux/configureStore";
+
 import {
   Card,
   CardActions,
@@ -57,10 +59,14 @@ export default class CardExampleControlled extends React.Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
-        expanded: false
-    }
+      expanded: false,
+      snippet: {}
+    };
   }
-  
+    componentWillMount(){
+      this.setState({snippet: this.props.snippet})
+      console.log(this.state.snippet)
+    }
 
   render() {
     const {
@@ -76,8 +82,12 @@ export default class CardExampleControlled extends React.Component<any, any> {
       deleteSnippet,
       id
     } = this.props.snippet;
+
     return (
-      <Card expanded={this.state.expanded} onExpandChange={() => this.setState({expanded: !this.state.expanded})}>
+      <Card
+        expanded={this.state.expanded}
+        onExpandChange={() => this.setState({ expanded: !this.state.expanded })}
+      >
         <CardHeader
           title={`${user}/${project}/${purpose}/${title}`}
           subtitle={
@@ -89,34 +99,41 @@ export default class CardExampleControlled extends React.Component<any, any> {
           actAsExpander={true}
           showExpandableButton={true}
           avatar={
-             <img
+            <img
               onClick={e => {
                 e.stopPropagation();
                 this.props.handleImgClick(this.props.snippet);
               }}
-              src={'asdf' || downloadUrl}
+              src={downloadUrl}
               style={{
                 maxWidth: "100px",
                 maxHeight: "200px"
               }}
-            /> 
-          } 
+            />
+          }
         />
-        <CardText expandable={true} >
+        <CardText expandable={true}>
           <FlatButton
             label={"Delete Snippet"}
             backgroundColor="orange"
             hoverColor="red"
             onClick={() => {
-                this.props.deleteSnippet(id)
-                this.setState({expanded: false})
+              this.props.deleteSnippet(id);
+              this.setState({ expanded: false });
             }}
           />
           {_.map(this.props.snippet, (val, key) => {
             return (
               <TextField
                 key={key}
-                defaultValue={val as string}
+                value={this.state.snippet[key]}
+                onChange={e => {
+                  const edited = {
+                    ...this.state.snippet,
+                    [key]: (e.target as any).value
+                  };
+                  this.setState({ snippet: edited });
+                }}
                 floatingLabelText={key}
                 multiLine={true}
                 fullWidth={true}
@@ -127,6 +144,10 @@ export default class CardExampleControlled extends React.Component<any, any> {
             label={"Save edits"}
             backgroundColor="silver"
             hoverColor="#0080ff"
+            onClick={e=>{
+              let {id, ...snippet} = this.state.snippet
+              dbRef.ref().child("snippets/" + id).update(snippet);
+            }}
           />
         </CardText>
       </Card>
