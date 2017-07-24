@@ -145,12 +145,10 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   };
 
   componentDidMount() {
-    if (this.props.match.params.key) {
-      this.handleLoad(this.props.match.params.key);
-    }
-    if (this.props.match.params.title) {
-      this.setState({ title: this.props.match.params.title });
-    }
+    const { key, title } = this.props.match.params;
+    if (key) this.handleLoad(key);
+    if (title) this.setState({ title });
+
     dbRef.ref("snippets").on("child_added", snapshot => {
       let val = snapshot.val();
       if (val.imgPath) {
@@ -192,7 +190,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     console.log(selection, snippet);
   };
 
-  handleSave = (e) => {
+  handleSave = e => {
     let serializedState = contentState(this.state.editorState);
     (serializedState as any).title = this.state.title;
     const urlAndTitleStateTheSame =
@@ -205,7 +203,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
       this.props.history.push("/" + this.state.title + "/" + key);
       this.setState({ dbKey: key });
     }
-  }
+  };
 
   handleLoad = key => {
     console.log(key);
@@ -229,12 +227,12 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     this.props.history.push("/");
   };
 
-  deleteSnippet = (key) =>{
-        dbRef.ref().child("snippets/" + key).remove();
-        this.setState({snippets: this.state.snippets.filter(
-          snippet => snippet.id !== key
-        )})
-  }
+  deleteSnippet = key => {
+    dbRef.ref().child("snippets/" + key).remove();
+    this.setState({
+      snippets: this.state.snippets.filter(snippet => snippet.id !== key)
+    });
+  };
 
   setTitle = e => {
     this.setState({ title: (e.target as any).value });
@@ -284,7 +282,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             toolbarClassName="home-toolbar"
             wrapperClassName="home-wrapper"
             editorClassName="home-editor"
-            editorStyle={{fontFamily: 'roboto'}}
+            editorStyle={{ fontFamily: "roboto" }}
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
             placeholder={"use '@text in snippet' to search snippets "}
