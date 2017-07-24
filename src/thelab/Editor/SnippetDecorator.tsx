@@ -284,6 +284,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             toolbarClassName="home-toolbar"
             wrapperClassName="home-wrapper"
             editorClassName="home-editor"
+            editorStyle={{fontFamily: 'roboto'}}
             onEditorStateChange={this.editorStateChanged}
             customDecorators={this.compositeDecorator._decorators}
             placeholder={"use '@text in snippet' to search snippets "}
