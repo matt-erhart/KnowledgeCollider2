@@ -217,7 +217,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     });
   };
 
-  handleDelete = () => {
+  handleDeleteSession = () => {
     dbRef.ref().child("draftjs/" + this.state.dbKey).remove();
     this.setState({
       editorState: Draft.EditorState.createEmpty(hexColorDecorator),
@@ -228,6 +228,14 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     this.setState({ dbKey: "", title: "" });
     this.props.history.push("/");
   };
+
+  deleteSnippet = (key) =>{
+        dbRef.ref().child("snippets/" + key).remove();
+        this.setState({snippets: this.state.snippets.filter(
+          snippet => snippet.id !== key
+        )})
+  }
+
   setTitle = e => {
     this.setState({ title: (e.target as any).value });
   };
@@ -267,7 +275,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             setTitle={this.setTitle}
             handleLoad={this.handleLoad}
             handleSave={this.handleSave}
-            handleDelete={this.handleDelete}
+            handleDelete={this.handleDeleteSession}
             sessions={this.state.sessions}
           />
           <Editor
@@ -287,6 +295,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             snippets={snippets}
             handleSortFilter={this.handleSortFilter.bind(this)}
             handleAttachEntity={this.createSnippetEntity}
+            deleteSnippet={this.deleteSnippet}
           />}
       </div>
     );

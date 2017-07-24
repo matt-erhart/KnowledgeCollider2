@@ -56,7 +56,12 @@ const Subtitle = props => {
 export default class CardExampleControlled extends React.Component<any, any> {
   constructor(props) {
     super(props);
+    this.state = {
+        expanded: false
+    }
   }
+  
+
   render() {
     const {
       downloadUrl,
@@ -67,10 +72,12 @@ export default class CardExampleControlled extends React.Component<any, any> {
       url,
       title,
       snippet,
-      comment
+      comment,
+      deleteSnippet,
+      id
     } = this.props.snippet;
     return (
-      <Card>
+      <Card expanded={this.state.expanded} onExpandChange={() => this.setState({expanded: !this.state.expanded})}>
         <CardHeader
           title={`${user}/${project}/${purpose}/${title}`}
           subtitle={
@@ -95,11 +102,15 @@ export default class CardExampleControlled extends React.Component<any, any> {
             /> 
           } 
         />
-        <CardText expandable={true}>
+        <CardText expandable={true} >
           <FlatButton
             label={"Delete Snippet"}
             backgroundColor="orange"
             hoverColor="red"
+            onClick={() => {
+                this.props.deleteSnippet(id)
+                this.setState({expanded: false})
+            }}
           />
           {_.map(this.props.snippet, (val, key) => {
             return (

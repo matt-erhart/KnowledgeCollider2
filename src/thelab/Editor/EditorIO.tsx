@@ -73,7 +73,7 @@ export class EditorIO extends React.Component<any, any> {
                   );
                 })}
           </IconMenu>
-          <FlatButton label="Delete"   onClick={e => handleDelete()}
+          <FlatButton label="Delete" hoverColor='red'  onClick={e => handleDelete()}
 />
         </form>
       </Card>
