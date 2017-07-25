@@ -23,7 +23,7 @@ export const SnippetEntityHoverDetails = props =>
     <div>Snippet: { Highlight(props.snippet, props.searchTerm)}</div>
     <div>Title: {Highlight(props.title || '', props.searchTerm)}</div>
     <img
-      src={props.downloadUrl}
+      src={props.imgUrl}
       style={{ maxWidth: "500px", maxHeight: "auto" }}
     />
   </div>;
