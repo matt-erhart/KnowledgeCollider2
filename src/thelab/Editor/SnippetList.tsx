@@ -35,13 +35,15 @@ export const SnippetList = ({
 
       {snippets.length > 0 &&
         snippets.map((snippet, i) => {
+          console.log('from list', snippet)
           return (
             <div
-              key={i}
+              key={i + snippet.id}
               style={{ display: "flex", border: "1px solid darkgrey" }}
             >
               <div style={{ flex: 1 }}>
                 <SnippetCard
+                  key={snippet.id}
                   snippet={snippet}
                   handleImgClick={handleImgClick}
                   handleAttachEntity={handleAttachEntity}

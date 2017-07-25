@@ -20,7 +20,7 @@ import { snippetSortFilter } from "./snippetSortFilter";
 import { contentState, createWithRawContent } from "./utils";
 import { withRouter } from "react-router-dom";
 import { EditorIO } from "./EditorIO";
-
+import * as _ from 'lodash'
 interface Session {
   title: string;
   key: string;
@@ -149,15 +149,32 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     if (key) this.handleLoad(key);
     if (title) this.setState({ title });
 
-    dbRef.ref("snippets").on("child_added", snapshot => {
-      let val = snapshot.val();
-      if (val.imgPath) {
-        storageRef.child(val.imgPath).getDownloadURL().then(url => {
-          val.id = snapshot.key;
-          val.downloadUrl = url;
-          this.setState({ snippets: this.state.snippets.concat(val) });
-        });
-      }
+    
+    dbRef.ref("snippets").on("value", snapshot => {
+      let snippets = [];
+      _.map(snapshot.val(), (val: snippet, key: string) => {
+        val.id = key;
+        snippets.push(val)
+      })
+      this.setState({snippets})
+      // let val = snapshot.val();
+      // val.id = snapshot.key;
+      // this.setState({ snippets: this.state.snippets.concat(val) });
+      //       console.log('from child added', this.state.snippets)
+
+      // let val = snapshot.val();
+      // let img = storageRef
+      //   .child(val.imgPath.replace("images/", "images/thumb_"))
+      //   .getDownloadURL()
+      //   .then(url => {if (url) console.log('!!!!!!!!!!', url)}).catch(err=>{})
+
+      // if (val.imgPath) {
+      //   storageRef.child(val.imgPath).getDownloadURL().then(url => {
+      //     val.id = snapshot.key;
+      //     val.downloadUrl = url;
+      //     this.setState({ snippets: this.state.snippets.concat(val) });
+      //   });
+      // }
     });
     dbRef.ref("draftjs").on("child_added", snapshot => {
       const session: Session = {
@@ -173,7 +190,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
 
   imgClick = snippet => {
     console.log("yeaa", snippet);
-    this.setState({ showImage: snippet.downloadUrl });
+    this.setState({ showImage: snippet.imgUrl });
   };
 
   handleSortFilter(e, field) {

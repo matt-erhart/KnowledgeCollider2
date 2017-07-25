@@ -60,17 +60,14 @@ export default class CardExampleControlled extends React.Component<any, any> {
     super(props);
     this.state = {
       expanded: false,
-      snippet: {}
+      snippet: this.props.snippet
     };
   }
-    componentWillMount(){
-      this.setState({snippet: this.props.snippet})
-      console.log(this.state.snippet)
-    }
-
+  
   render() {
     const {
-      downloadUrl,
+      imageUrl,
+      thumbUrl,
       user,
       project,
       purpose,
@@ -81,7 +78,8 @@ export default class CardExampleControlled extends React.Component<any, any> {
       comment,
       deleteSnippet,
       id
-    } = this.props.snippet;
+    } = this.state.snippet;
+
 
     return (
       <Card
@@ -104,7 +102,7 @@ export default class CardExampleControlled extends React.Component<any, any> {
                 e.stopPropagation();
                 this.props.handleImgClick(this.props.snippet);
               }}
-              src={downloadUrl}
+              src={thumbUrl}
               style={{
                 maxWidth: "100px",
                 maxHeight: "200px"
@@ -122,7 +120,7 @@ export default class CardExampleControlled extends React.Component<any, any> {
               this.setState({ expanded: false });
             }}
           />
-          {_.map(this.props.snippet, (val, key) => {
+          {_.map(this.state.snippet, (val, key) => {
             return (
               <TextField
                 key={key}
