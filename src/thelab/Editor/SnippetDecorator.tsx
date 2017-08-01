@@ -151,7 +151,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
   };
 
   handleHoverSnippet = (snippet: snippet, mousePos: number[]) => {
-    console.log(snippet, mousePos);
+    
     this.setState({ hoveredSnippet: snippet, mousePos: mousePos });
   };
   componentDidMount() {
@@ -303,7 +303,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
         </SkyLightStateless>
         <div
           className="home-wrapper"
-          style={{ flex: 1 }}
+          style={{ flex: 1, overflow: "scroll", height: '99vh' }}
           onClick={e => (this.refs.editor as any).editor.focus()}
         >
           <EditorIO

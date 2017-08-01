@@ -16,8 +16,7 @@ import IconMenu from "material-ui/IconMenu";
 import IconButton from "material-ui/IconButton";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import AppBar from "material-ui/AppBar";
-
-
+import ActionHome from 'material-ui/svg-icons/action/help';
 
 export class EditorIO extends React.Component<any, any> {
   constructor(props: any) {
@@ -58,24 +57,31 @@ export class EditorIO extends React.Component<any, any> {
             label="Save"
           />
           <IconMenu
-          onItemTouchTap={(e, item)=>{handleLoad(item.props.value)}}
+            onItemTouchTap={(e, item) => {
+              handleLoad(item.props.value);
+            }}
             iconButtonElement={<FlatButton label="Load" />}
             anchorOrigin={{ horizontal: "left", vertical: "top" }}
             targetOrigin={{ horizontal: "left", vertical: "top" }}
           >
             {sessions &&
-                sessions.length > 0 &&
-                sessions.map((session, i) => {
-                  return (
-                    <MenuItem
-                      key={session.key}
-                      value={session.key}
-                      primaryText={session.title}
-                    />
-                  );
-                })}
+              sessions.length > 0 &&
+              sessions.map((session, i) => {
+                return (
+                  <MenuItem
+                    key={session.key}
+                    value={session.key}
+                    primaryText={session.title}
+                  />
+                );
+              })}
           </IconMenu>
-          <FlatButton label="Delete" hoverColor='red'  onClick={e => handleDelete()}/>    
+          <FlatButton
+            label="Delete"
+            hoverColor="red"
+            onClick={e => handleDelete()}
+          />
+          <IconButton href='/help/-KqRGLSQRd21EXXAA_pW' target='_blank'><ActionHome color='grey' hoverColor='black'/></IconButton>
         </form>
       </Card>
     );
