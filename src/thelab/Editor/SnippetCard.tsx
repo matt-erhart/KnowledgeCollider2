@@ -17,6 +17,20 @@ interface props {
   snippet: snippet;
 }
 
+export const HoverCard = props => {
+  return (
+    <div style={{width: '500px', backgroundColor: 'WhiteSmoke', borderColor: 'black', zIndex: 999, pointerEvents: 'none', padding: '10px'}}>
+      <b style={{ color: "#7EB6FF" }}> Snippet: </b>
+      {props.snippet.snippet} / {props.snippet.created}
+      <hr />
+      <img
+        src={props.snippet.imgUrl}
+        style={{ maxWidth: 500, maxHeight: 500 }}
+      />
+    </div>
+  );
+};
+
 const Subtitle = props => {
   return (
     <div>
@@ -63,7 +77,7 @@ export default class CardExampleControlled extends React.Component<any, any> {
       snippet: this.props.snippet
     };
   }
-  
+
   render() {
     const {
       imageUrl,
@@ -79,7 +93,6 @@ export default class CardExampleControlled extends React.Component<any, any> {
       deleteSnippet,
       id
     } = this.state.snippet;
-
 
     return (
       <Card
@@ -142,8 +155,8 @@ export default class CardExampleControlled extends React.Component<any, any> {
             label={"Save edits"}
             backgroundColor="silver"
             hoverColor="#0080ff"
-            onClick={e=>{
-              let {id, ...snippet} = this.state.snippet
+            onClick={e => {
+              let { id, ...snippet } = this.state.snippet;
               dbRef.ref().child("snippets/" + id).update(snippet);
             }}
           />

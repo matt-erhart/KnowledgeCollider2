@@ -17,7 +17,7 @@ export const Highlight = (text, term) => {
 
 //on hover
 export const SnippetEntityHoverDetails = props => 
-  <div>
+  <div >
     <div><strong>{ Highlight(props.comment, props.searchTerm)}</strong></div>
     <div>Created: {props.created}</div>
     <div>Snippet: { Highlight(props.snippet, props.searchTerm)}</div>

@@ -12,7 +12,8 @@ import { SnippetSuggestionListInEditor } from "./SnippetSuggestionListInEditor";
 import { SkyLightStateless } from "react-skylight";
 import * as Rx from "rxjs";
 import { SnippetList } from "./SnippetList";
-import { snippetItemComponent } from "./SnippetItemComponent";
+import {HoverCard} from "./SnippetCard"
+// import { snippetItemComponent } from "./SnippetItemComponent";
 // import {createSnippetEntity} from './createSnippetEntity'
 
 import { hexColorDecorator } from "./DecoratorWithProps";
@@ -20,7 +21,7 @@ import { snippetSortFilter } from "./snippetSortFilter";
 import { contentState, createWithRawContent } from "./utils";
 import { withRouter } from "react-router-dom";
 import { EditorIO } from "./EditorIO";
-import * as _ from 'lodash'
+import * as _ from "lodash";
 interface Session {
   title: string;
   key: string;
@@ -33,6 +34,8 @@ interface SnippetDecoratorState {
   dbKey: string;
   title: string;
   sessions: Session[];
+  hoveredSnippet: snippet;
+  mousePos: number[];
 }
 
 class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
@@ -53,7 +56,10 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
         const instance = currentContent.getEntity(props.entityKey);
         const data = instance.getData() as snippet;
         return (
-          <SnippetEntity snippet={data}>
+          <SnippetEntity
+            snippet={data}
+            handleHoverSnippet={this.handleHoverSnippet}
+          >
             {props.children}
           </SnippetEntity>
         );
@@ -144,19 +150,22 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     this.setState({ editorState: newEditorState });
   };
 
+  handleHoverSnippet = (snippet: snippet, mousePos: number[]) => {
+    console.log(snippet, mousePos);
+    this.setState({ hoveredSnippet: snippet, mousePos: mousePos });
+  };
   componentDidMount() {
     const { key, title } = this.props.match.params;
     if (key) this.handleLoad(key);
     if (title) this.setState({ title });
 
-    
     dbRef.ref("snippets").on("value", snapshot => {
       let snippets = [];
       _.map(snapshot.val(), (val: snippet, key: string) => {
         val.id = key;
-        snippets.push(val)
-      })
-      this.setState({snippets})
+        snippets.push(val);
+      });
+      this.setState({ snippets });
       // let val = snapshot.val();
       // val.id = snapshot.key;
       // this.setState({ snippets: this.state.snippets.concat(val) });
@@ -262,6 +271,18 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
     );
     return (
       <div style={{ display: "flex", alignItems: "stretch", height: "100vh" }}>
+        {_.get(this.state.mousePos, 0, 0) > 0 &&
+            <div
+              style={{
+                position: "absolute",
+                top: this.state.mousePos[1],
+                left: this.state.mousePos[0],
+                zIndex: 999,
+                pointerEvents: 'none'
+              }}
+            >
+              <HoverCard snippet={this.state.hoveredSnippet} />
+            </div>}
         <SkyLightStateless
           hideOnOverlayClicked
           dialogStyles={{
@@ -304,6 +325,7 @@ class SnippetDecorator extends React.Component<any, SnippetDecoratorState> {
             customDecorators={this.compositeDecorator._decorators}
             placeholder={"use '@text in snippet' to search snippets "}
           />
+          
         </div>
         {this.state.snippets &&
           <SnippetList

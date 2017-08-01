@@ -1,26 +1,44 @@
 import * as React from "react";
-import {SnippetEntityHoverDetails} from './SnippetEntityHoverDetails'
+import { SnippetEntityHoverDetails } from "./SnippetEntityHoverDetails";
+
+interface State {
+  hovering: boolean;
+  x: number;
+  y: number;
+}
 
 //in the editor
 export class SnippetEntity extends React.Component<
-  { snippet: snippet },
-  { hovering: boolean }
+  { snippet: snippet; handleHoverSnippet },
+  State
 > {
-  state = { hovering: false };
+  state = { hovering: false, x: null, y: null };
   render() {
     return (
-      <span>
-        <span style={{color: 'blue'}}
+      <span
+       onMouseEnter={() => this.setState({ hovering: true })}
+          onMouseLeave={() => this.props.handleHoverSnippet({}, [0, 0])}
+          onMouseMove={e => {
+            const { clientX, clientY } = e.nativeEvent;
+            this.props.handleHoverSnippet(this.props.snippet, [
+              clientX,
+              clientY
+            ]);
+            this.setState({ x: screenX, y: screenY });
+          }}
+      >
+        <span
+          style={{ color: "blue" }}
           className="stockItem"
-          onMouseEnter={() => this.setState({ hovering: true })}
-          onMouseLeave={() => this.setState({ hovering: false })}
+         
         >
           {this.props.children}
         </span>
-        {this.state.hovering &&
-          <div className="stockItemHover">
-            <SnippetEntityHoverDetails {...this.props.snippet} />
-          </div>}
+        {/* {this.state.hovering &&
+          <div style={{position: 'absolute', zIndex: 999}}
+          >
+            <SnippetEntityHoverDetails x={this.state.x} y={this.state.y} {...this.props.snippet} />
+          </div>} */}
       </span>
     );
   }
